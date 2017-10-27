@@ -8,4 +8,8 @@ RSpec.describe Task, type: :model do
       it { is_expected.to have_many(:comments).dependent(:destroy) }
     end
   end
+
+  context 'columns' do
+    it { is_expected.to have_db_column(:comments_count) }
+  end
 end
