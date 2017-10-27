@@ -23,10 +23,10 @@ require 'rails_helper'
 # removed from Rails core in Rails 5, but can be added back in via the
 # `rails-controller-testing` gem.
 
-RSpec.describe ProjectsController, type: :controller do
+RSpec.describe Api::V1::CommentsController, type: :controller do
 
   # This should return the minimal set of attributes required to create a valid
-  # Project. As you add validations to Project, be sure to
+  # Comment. As you add validations to Comment, be sure to
   # adjust the attributes here as well.
   let(:valid_attributes) {
     skip("Add a hash of attributes valid for your model")
@@ -38,12 +38,12 @@ RSpec.describe ProjectsController, type: :controller do
 
   # This should return the minimal set of values that should be in the session
   # in order to pass any filters (e.g. authentication) defined in
-  # ProjectsController. Be sure to keep this updated too.
+  # CommentsController. Be sure to keep this updated too.
   let(:valid_session) { {} }
 
   describe "GET #index" do
     it "returns a success response" do
-      project = Project.create! valid_attributes
+      comment = Comment.create! valid_attributes
       get :index, params: {}, session: valid_session
       expect(response).to be_success
     end
@@ -51,33 +51,33 @@ RSpec.describe ProjectsController, type: :controller do
 
   describe "GET #show" do
     it "returns a success response" do
-      project = Project.create! valid_attributes
-      get :show, params: {id: project.to_param}, session: valid_session
+      comment = Comment.create! valid_attributes
+      get :show, params: {id: comment.to_param}, session: valid_session
       expect(response).to be_success
     end
   end
 
   describe "POST #create" do
     context "with valid params" do
-      it "creates a new Project" do
+      it "creates a new Comment" do
         expect {
-          post :create, params: {project: valid_attributes}, session: valid_session
-        }.to change(Project, :count).by(1)
+          post :create, params: {comment: valid_attributes}, session: valid_session
+        }.to change(Comment, :count).by(1)
       end
 
-      it "renders a JSON response with the new project" do
+      it "renders a JSON response with the new comment" do
 
-        post :create, params: {project: valid_attributes}, session: valid_session
+        post :create, params: {comment: valid_attributes}, session: valid_session
         expect(response).to have_http_status(:created)
         expect(response.content_type).to eq('application/json')
-        expect(response.location).to eq(project_url(Project.last))
+        expect(response.location).to eq(comment_url(Comment.last))
       end
     end
 
     context "with invalid params" do
-      it "renders a JSON response with errors for the new project" do
+      it "renders a JSON response with errors for the new comment" do
 
-        post :create, params: {project: invalid_attributes}, session: valid_session
+        post :create, params: {comment: invalid_attributes}, session: valid_session
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.content_type).to eq('application/json')
       end
@@ -90,27 +90,27 @@ RSpec.describe ProjectsController, type: :controller do
         skip("Add a hash of attributes valid for your model")
       }
 
-      it "updates the requested project" do
-        project = Project.create! valid_attributes
-        put :update, params: {id: project.to_param, project: new_attributes}, session: valid_session
-        project.reload
+      it "updates the requested comment" do
+        comment = Comment.create! valid_attributes
+        put :update, params: {id: comment.to_param, comment: new_attributes}, session: valid_session
+        comment.reload
         skip("Add assertions for updated state")
       end
 
-      it "renders a JSON response with the project" do
-        project = Project.create! valid_attributes
+      it "renders a JSON response with the comment" do
+        comment = Comment.create! valid_attributes
 
-        put :update, params: {id: project.to_param, project: valid_attributes}, session: valid_session
+        put :update, params: {id: comment.to_param, comment: valid_attributes}, session: valid_session
         expect(response).to have_http_status(:ok)
         expect(response.content_type).to eq('application/json')
       end
     end
 
     context "with invalid params" do
-      it "renders a JSON response with errors for the project" do
-        project = Project.create! valid_attributes
+      it "renders a JSON response with errors for the comment" do
+        comment = Comment.create! valid_attributes
 
-        put :update, params: {id: project.to_param, project: invalid_attributes}, session: valid_session
+        put :update, params: {id: comment.to_param, comment: invalid_attributes}, session: valid_session
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.content_type).to eq('application/json')
       end
@@ -118,11 +118,11 @@ RSpec.describe ProjectsController, type: :controller do
   end
 
   describe "DELETE #destroy" do
-    it "destroys the requested project" do
-      project = Project.create! valid_attributes
+    it "destroys the requested comment" do
+      comment = Comment.create! valid_attributes
       expect {
-        delete :destroy, params: {id: project.to_param}, session: valid_session
-      }.to change(Project, :count).by(-1)
+        delete :destroy, params: {id: comment.to_param}, session: valid_session
+      }.to change(Comment, :count).by(-1)
     end
   end
 

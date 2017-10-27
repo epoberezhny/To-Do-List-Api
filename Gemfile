@@ -19,6 +19,9 @@ gem 'cancancan',         '~> 2.0'
 
 gem 'rack-cors'
 
+gem 'carrierwave', '~> 1.2', '>= 1.2.1'
+gem 'cloudinary',  '~> 1.8', '>= 1.8.1'
+
 group :development, :test do
   gem 'ruby-debug-ide'
   gem 'debase'
