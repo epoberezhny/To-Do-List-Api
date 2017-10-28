@@ -11,9 +11,6 @@ gem 'rails', '~> 5.1.4'
 gem 'pg',    '~> 0.18'
 gem 'puma',  '~> 3.7'
 
-# Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
-# gem 'jbuilder', '~> 2.5'
-
 gem 'devise_token_auth', '~> 0.1.42'
 gem 'cancancan',         '~> 2.0'
 
@@ -21,6 +18,8 @@ gem 'rack-cors'
 
 gem 'carrierwave', '~> 1.2', '>= 1.2.1'
 gem 'cloudinary',  '~> 1.8', '>= 1.8.1'
+
+gem 'ranked-model', '~> 0.4.0'
 
 group :development, :test do
   gem 'ruby-debug-ide'
