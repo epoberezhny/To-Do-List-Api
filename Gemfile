@@ -19,7 +19,7 @@ gem 'rack-cors'
 gem 'carrierwave', '~> 1.2', '>= 1.2.1'
 gem 'cloudinary',  '~> 1.8', '>= 1.8.1'
 
-gem 'ranked-model', '~> 0.4.0'
+gem 'acts_as_list', '~> 0.9.9'
 
 group :development, :test do
   gem 'ruby-debug-ide'
