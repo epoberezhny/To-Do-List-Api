@@ -24,9 +24,7 @@ gem 'acts_as_list', '~> 0.9.9'
 group :development, :test do
   gem 'ruby-debug-ide'
   gem 'debase'
-end
 
-group :development do
   gem 'spring'
   gem 'figaro'
 end
