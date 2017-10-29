@@ -10,7 +10,7 @@ RSpec.describe 'Tasks management', type: :request do
 
       before { get(api_v1_tasks_path, headers: headers, params: params) }
 
-      include_examples 'match schema', 'task', list: true
+      include_examples 'match schema', 'tasks'
 
       it_behaves_like 'successful response'
     end

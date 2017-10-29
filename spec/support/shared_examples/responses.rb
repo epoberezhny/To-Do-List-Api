@@ -41,6 +41,6 @@ RSpec.shared_examples 'forbidden response' do
   end
 end
 
-RSpec.shared_examples 'match schema' do |schema, options|
-  it { expect(response).to match_response_schema(schema, options) }
+RSpec.shared_examples 'match schema' do |schema|
+  it { expect(response).to match_response_schema(schema) }
 end

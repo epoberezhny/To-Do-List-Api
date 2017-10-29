@@ -11,7 +11,7 @@ RSpec.describe 'Comments management', type: :request do
 
       before { get(api_v1_comments_path, headers: headers, params: params) }
 
-      include_examples 'match schema', 'comment', list: true
+      include_examples 'match schema', 'comments'
 
       it_behaves_like 'successful response'
     end

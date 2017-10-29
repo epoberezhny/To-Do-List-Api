@@ -8,7 +8,7 @@ RSpec.describe 'Projects management', type: :request do
 
       before { get(api_v1_projects_path, headers: headers) }
 
-      include_examples 'match schema', 'project', list: true
+      include_examples 'match schema', 'projects'
 
       it_behaves_like 'successful response'
     end
