@@ -1,0 +1,31 @@
+{
+  "type": "object",
+  "required": [
+    "id",
+    "text",
+    "attachment",
+    "created_at"
+  ],
+  "properties": {
+    "id": {
+      "type": "integer"
+    },
+    "text": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "date"
+    },
+    "attachment": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": [
+            "null",
+            "string"
+          ]
+        }
+      }
+    }
+  }
+}
