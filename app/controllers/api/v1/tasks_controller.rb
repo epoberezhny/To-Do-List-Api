@@ -1,30 +1,23 @@
 class Api::V1::TasksController < Api::V1::ApplicationController
-  before_action :set_task, only: [:show, :update, :destroy]
+  load_and_authorize_resource :project
+  load_and_authorize_resource :task, through: :project
 
-  # GET /tasks
   def index
-    @tasks = Task.all
-
     render json: @tasks
   end
 
-  # GET /tasks/1
   def show
     render json: @task
   end
 
-  # POST /tasks
   def create
-    @task = Task.new(task_params)
-
     if @task.save
-      render json: @task, status: :created, location: @task
+      render json: @task, status: :created, location: api_v1_task_url(@task)
     else
       render json: @task.errors, status: :unprocessable_entity
     end
   end
 
-  # PATCH/PUT /tasks/1
   def update
     if @task.update(task_params)
       render json: @task
@@ -33,19 +26,13 @@ class Api::V1::TasksController < Api::V1::ApplicationController
     end
   end
 
-  # DELETE /tasks/1
   def destroy
     @task.destroy
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_task
-      @task = Task.find(params[:id])
-    end
 
-    # Only allow a trusted parameter "white list" through.
-    def task_params
-      params.require(:task).permit(:name, :project_id, :done, :priority, :deadline, :comments_count)
-    end
+  def task_params
+    params.permit(:name, :done, :priority, :deadline)
+  end
 end

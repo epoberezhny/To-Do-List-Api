@@ -9,6 +9,12 @@ RSpec.describe Task, type: :model do
     end
   end
 
+  context 'validations' do
+    context 'presence' do
+      it { is_expected.to validate_presence_of(:name) }      
+    end
+  end
+
   context 'columns' do
     it { is_expected.to have_db_column(:comments_count) }
   end

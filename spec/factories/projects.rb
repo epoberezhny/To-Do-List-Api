@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :project do
-    name "MyString"
-    user nil
+    sequence(:name) { |n| "Project #{n}" }
+    user
   end
 end

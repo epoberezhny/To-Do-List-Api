@@ -10,6 +10,10 @@ RSpec.describe Project, type: :model do
   end
 
   context 'validations' do
+    context 'presence' do
+      it { is_expected.to validate_presence_of(:name) }      
+    end
+    
     context 'uniqueness' do
       it { is_expected.to validate_uniqueness_of(:name).scoped_to(:user_id) }      
     end

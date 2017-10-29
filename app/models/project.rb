@@ -3,5 +3,5 @@ class Project < ApplicationRecord
 
   has_many :tasks, dependent: :destroy
 
-  validates :name, uniqueness: { scope: :user_id }
+  validates :name, presence: true, uniqueness: { scope: :user_id }
 end

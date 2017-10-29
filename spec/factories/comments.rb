@@ -1,7 +1,6 @@
 FactoryGirl.define do
   factory :comment do
-    text "MyText"
-    task nil
-    attachment "MyString"
+    sequence(:text) { |n| "My text #{n}" }    
+    task
   end
 end

@@ -5,9 +5,11 @@ ENV['RAILS_ENV'] ||= 'test'
 require File.expand_path('../../config/environment', __FILE__)
 
 # Prevent database truncation if the environment is production
-abort("The Rails environment is running in production mode!") if Rails.env.production?
+abort('The Rails environment is running in production mode!') if Rails.env.production?
 
 require 'rspec/rails'
+require 'cancan/matchers'
+require 'json_matchers/rspec'
 
 Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
 
@@ -18,5 +20,5 @@ RSpec.configure do |config|
 
   config.filter_rails_from_backtrace!
 
-  # config.include(Devise::Test::IntegrationHelpers, type: :feature)
+  config.include(Devise::Test::ControllerHelpers, type: :controller)
 end
