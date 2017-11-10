@@ -12,7 +12,7 @@ class Api::V1::TasksController < Api::V1::ApplicationController
 
   def create
     if @task.save
-      render json: @task, status: :created, location: api_v1_task_url(@task)
+      render json: @task, status: :created, location: api_v1_project_task_url(@project, @task)
     else
       render json: @task.errors, status: :unprocessable_entity
     end
