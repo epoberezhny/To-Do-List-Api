@@ -13,6 +13,7 @@ class Api::V1::CommentsController < Api::V1::ApplicationController
 
   def create
     if @comment.save
+      @comment.reload
       render json: @comment,
              status: :created,
              location: api_v1_project_task_comment_url(@project, @task, @comment)
