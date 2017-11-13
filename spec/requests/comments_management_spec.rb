@@ -3,13 +3,12 @@ RSpec.describe 'Comments management', type: :request do
   let(:headers) { user.create_new_auth_token }
   let(:project) { create(:project, user: user) }
   let(:task)    { create(:task, project: project) }
-  let(:params)  { { project_id: project.id, task_id: task.id } }
 
-  describe 'GET api/v1/comments' do
+  describe 'GET api/v1/projects/:project_id/tasks/:task_id/comments' do
     context 'success' do
       let!(:comment) { create_list(:comment, 3, task: task) }
 
-      before { get(api_v1_comments_path, headers: headers, params: params) }
+      before { get(api_v1_project_task_comments_path(project, task), headers: headers) }
 
       include_examples 'match schema', 'comments'
 
@@ -17,17 +16,17 @@ RSpec.describe 'Comments management', type: :request do
     end
 
     context 'unauthorized' do
-      before { get(api_v1_comments_path) }
+      before { get(api_v1_project_task_comments_path(project, task)) }
 
       it_behaves_like 'unauthorized response'
     end
   end
 
-  describe 'GET /api/v1/comments/:id' do
+  describe 'GET /api/v1/projects/:project_id/tasks/:task_id/comments/:id' do
     context 'success' do
       let(:comment) { create(:comment, task: task) }
 
-      before { get(api_v1_comment_path(comment), headers: headers, params: params) }
+      before { get(api_v1_project_task_comment_path(project, task, comment), headers: headers) }
 
       include_examples 'match schema', 'comment'
 
@@ -36,9 +35,10 @@ RSpec.describe 'Comments management', type: :request do
 
     context 'forbidden' do
       let(:comment) { create(:comment) }
-      let(:params)  { { project_id: comment.task.project.id, task_id: comment.task.id } }
+      let(:task)    { comment.task }
+      let(:project) { task.project }
 
-      before { get(api_v1_comment_path(comment), headers: headers, params: params) }
+      before { get(api_v1_project_task_comment_path(project, task, comment), headers: headers) }
 
       it_behaves_like 'forbidden response'
     end
@@ -46,52 +46,52 @@ RSpec.describe 'Comments management', type: :request do
     context 'not found' do
       let(:comment) { create(:comment, task: task) }
 
-      before { get(api_v1_comment_path(comment.id + 1), headers: headers, params: params) }
+      before { get(api_v1_project_task_comment_path(project, task, comment.id + 1), headers: headers) }
 
       it_behaves_like 'not found response'
     end
 
     context 'unauthorized' do
-      before { get api_v1_comment_path(1) }
+      before { get api_v1_project_task_comment_path(project, task, 1) }
 
       it_behaves_like 'unauthorized response'
     end
   end
 
-  describe 'POST /api/v1/comments' do
+  describe 'POST /api/v1/projects/:project_id/tasks/:task_id/comments' do
     context 'created' do
-      let(:params) { attributes_for(:comment, project_id: project.id, task_id: task.id) }
+      let(:params) { attributes_for(:comment) }
 
-      before { post(api_v1_comments_path, headers: headers, params: params) }
+      before { post(api_v1_project_task_comments_path(project, task), headers: headers, params: params) }
 
       include_examples 'match schema', 'comment'
 
       it_behaves_like 'created response' do
-        let(:location) { api_v1_comment_url(Comment.last) }
+        let(:location) { api_v1_project_task_comment_url(project, task, Comment.last) }
       end
     end
 
     context 'unprocessable' do
-      let(:params) { attributes_for(:comment, text: '', project_id: project.id, task_id: task.id) }
+      let(:params) { attributes_for(:comment, text: '') }
 
-      before { post(api_v1_comments_path, headers: headers, params: params) }
+      before { post(api_v1_project_task_comments_path(project, task), headers: headers, params: params) }
 
       it_behaves_like 'unprocessable response'
     end
 
     context 'unauthorized' do
-      before { post(api_v1_comments_path) }
+      before { post(api_v1_project_task_comments_path(project, task)) }
 
       it_behaves_like 'unauthorized response'
     end
   end
 
-  describe 'PATCH /api/v1/project/:id' do
+  describe 'PATCH /api/v1/projects/:project_id/tasks/:task_id/cooments/:id' do
     context 'success' do
       let(:comment) { create(:comment, task: task) }
-      let(:params)  { attributes_for(:comment, name: 'New name', project_id: project.id, task_id: task.id) }
+      let(:params)  { attributes_for(:comment, name: 'New name') }
 
-      before { patch(api_v1_comment_path(comment), headers: headers, params: params) }
+      before { patch(api_v1_project_task_comment_path(project, task, comment), headers: headers, params: params) }
 
       include_examples 'match schema', 'comment'
 
@@ -100,18 +100,19 @@ RSpec.describe 'Comments management', type: :request do
 
     context 'unprocessable' do
       let(:comment) { create(:comment, task: task) }
-      let(:params)  { attributes_for(:comment, text: '', project_id: project.id, task_id: task.id) }
+      let(:params)  { attributes_for(:comment, text: '') }
 
-      before { patch(api_v1_comment_path(comment), headers: headers, params: params) }
+      before { patch(api_v1_project_task_comment_path(project, task, comment), headers: headers, params: params) }
 
       it_behaves_like 'unprocessable response'
     end
 
     context 'forbidden' do
       let(:comment) { create(:comment) }
-      let(:params)  { { project_id: comment.task.project.id, task_id: comment.task.id } }
+      let(:task)    { comment.task }
+      let(:project) { task.project }
 
-      before { patch(api_v1_comment_path(comment), headers: headers, params: params) }
+      before { patch(api_v1_project_task_comment_path(project, task, comment), headers: headers) }
 
       it_behaves_like 'forbidden response'
     end
@@ -119,32 +120,33 @@ RSpec.describe 'Comments management', type: :request do
     context 'not found' do
       let(:comment) { create(:comment, task: task) }
 
-      before { patch(api_v1_comment_path(comment.id + 1), headers: headers, params: params) }
+      before { patch(api_v1_project_task_comment_path(project, task, comment.id + 1), headers: headers) }
 
       it_behaves_like 'not found response'
     end
 
     context 'unauthorized' do
-      before { patch(api_v1_comment_path(1)) }
+      before { patch(api_v1_project_task_comment_path(project, task, 1)) }
 
       it_behaves_like 'unauthorized response'
     end
   end
 
-  describe 'DELETE /api/v1/comments/:id' do
+  describe 'DELETE /api/v1/projects/:project_id/tasks/:task_id/comments/:id' do
     context 'success' do
       let(:comment) { create(:comment, task: task) }
 
-      before { delete(api_v1_comment_path(comment), headers: headers, params: params) }
+      before { delete(api_v1_project_task_comment_path(project, task, comment), headers: headers) }
 
       it_behaves_like 'successful response'
     end
 
     context 'forbidden' do
       let(:comment) { create(:comment) }
-      let(:params) { { project_id: comment.task.project.id, task_id: comment.task.id } }
+      let(:task)    { comment.task }
+      let(:project) { task.project }
 
-      before { delete(api_v1_comment_path(comment), headers: headers, params: params) }
+      before { delete(api_v1_project_task_comment_path(project, task, comment), headers: headers) }
 
       it_behaves_like 'forbidden response'
     end
@@ -152,13 +154,13 @@ RSpec.describe 'Comments management', type: :request do
     context 'not found' do
       let(:comment) { create(:comment, task: task) }
 
-      before { delete(api_v1_comment_path(comment.id + 1), headers: headers, params: params) }
+      before { delete(api_v1_project_task_comment_path(project, task, comment.id + 1), headers: headers) }
 
       it_behaves_like 'not found response'
     end
 
     context 'unauthorized' do
-      before { delete api_v1_comment_path(1) }
+      before { delete api_v1_project_task_comment_path(project, task, 1) }
 
       it_behaves_like 'unauthorized response'
     end

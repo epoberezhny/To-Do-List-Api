@@ -2,13 +2,12 @@ RSpec.describe 'Tasks management', type: :request do
   let(:user)    { create(:user) }
   let(:headers) { user.create_new_auth_token }
   let(:project) { create(:project, user: user) }
-  let(:params)  { { project_id: project.id } }
 
-  describe 'GET api/v1/tasks' do
+  describe 'GET api/v1/projects/:project_id/tasks' do
     context 'success' do
       let!(:task) { create_list(:task, 3, project: project) }
 
-      before { get(api_v1_tasks_path, headers: headers, params: params) }
+      before { get(api_v1_project_tasks_path(project), headers: headers) }
 
       include_examples 'match schema', 'tasks'
 
@@ -16,17 +15,17 @@ RSpec.describe 'Tasks management', type: :request do
     end
 
     context 'unauthorized' do
-      before { get(api_v1_tasks_path) }
+      before { get(api_v1_project_tasks_path(project)) }
 
       it_behaves_like 'unauthorized response'
     end
   end
 
-  describe 'GET /api/v1/tasks/:id' do
+  describe 'GET /api/v1/projects/:project_id/tasks/:id' do
     context 'success' do
       let(:task) { create(:task, project: project) }
 
-      before { get(api_v1_task_path(task), headers: headers, params: params) }
+      before { get(api_v1_project_task_path(project, task), headers: headers) }
 
       include_examples 'match schema', 'task'
 
@@ -34,10 +33,10 @@ RSpec.describe 'Tasks management', type: :request do
     end
 
     context 'forbidden' do
-      let(:task)   { create(:task) }
-      let(:params) { { project_id: task.project.id } }
+      let(:task)    { create(:task) }
+      let(:project) { task.project }
 
-      before { get(api_v1_task_path(task), headers: headers, params: params) }
+      before { get(api_v1_project_task_path(project, task), headers: headers) }
 
       it_behaves_like 'forbidden response'
     end
@@ -45,52 +44,52 @@ RSpec.describe 'Tasks management', type: :request do
     context 'not found' do
       let(:task) { create(:task, project: project) }
 
-      before { get(api_v1_task_path(task.id + 1), headers: headers, params: params) }
+      before { get(api_v1_project_task_path(project, task.id + 1), headers: headers) }
 
       it_behaves_like 'not found response'
     end
 
     context 'unauthorized' do
-      before { get api_v1_task_path(1) }
+      before { get api_v1_project_task_path(project, 1) }
 
       it_behaves_like 'unauthorized response'
     end
   end
 
-  describe 'POST /api/v1/tasks' do
+  describe 'POST /api/v1/projects/:project_id/tasks' do
     context 'created' do
-      let(:params) { attributes_for(:task, project_id: project.id) }
+      let(:params) { attributes_for(:task) }
 
-      before { post(api_v1_tasks_path, headers: headers, params: params) }
+      before { post(api_v1_project_tasks_path(project), headers: headers, params: params) }
 
       include_examples 'match schema', 'task'
 
       it_behaves_like 'created response' do
-        let(:location) { api_v1_task_url(Task.last) }
+        let(:location) { api_v1_project_task_url(project, Task.last) }
       end
     end
 
     context 'unprocessable' do
-      let(:params) { attributes_for(:task, name: '', project_id: project.id) }
+      let(:params) { attributes_for(:task, name: '') }
 
-      before { post(api_v1_tasks_path, headers: headers, params: params) }
+      before { post(api_v1_project_tasks_path(project), headers: headers, params: params) }
 
       it_behaves_like 'unprocessable response'
     end
 
     context 'unauthorized' do
-      before { post(api_v1_tasks_path) }
+      before { post(api_v1_project_tasks_path(project)) }
 
       it_behaves_like 'unauthorized response'
     end
   end
 
-  describe 'PATCH /api/v1/project/:id' do
+  describe 'PATCH /api/v1/projects/:project_id/tasks/:id' do
     context 'success' do
       let(:task)   { create(:task, project: project) }
-      let(:params) { attributes_for(:task, name: 'New name', project_id: project.id) }
+      let(:params) { attributes_for(:task, name: 'New name') }
 
-      before { patch(api_v1_task_path(task), headers: headers, params: params) }
+      before { patch(api_v1_project_task_path(project, task), headers: headers, params: params) }
 
       include_examples 'match schema', 'task'
 
@@ -99,18 +98,18 @@ RSpec.describe 'Tasks management', type: :request do
 
     context 'unprocessable' do
       let(:task)   { create(:task, project: project) }
-      let(:params) { attributes_for(:task, name: '', project_id: project.id) }
+      let(:params) { attributes_for(:task, name: '') }
 
-      before { patch(api_v1_task_path(task), headers: headers, params: params) }
+      before { patch(api_v1_project_task_path(project, task), headers: headers, params: params) }
 
       it_behaves_like 'unprocessable response'
     end
 
     context 'forbidden' do
-      let(:task)   { create(:task) }
-      let(:params) { { project_id: task.project.id } }
+      let(:task)    { create(:task) }
+      let(:project) { task.project }
 
-      before { patch(api_v1_task_path(task), headers: headers, params: params) }
+      before { patch(api_v1_project_task_path(project, task), headers: headers) }
 
       it_behaves_like 'forbidden response'
     end
@@ -118,32 +117,32 @@ RSpec.describe 'Tasks management', type: :request do
     context 'not found' do
       let(:task) { create(:task, project: project) }
 
-      before { patch(api_v1_task_path(task.id + 1), headers: headers, params: params) }
+      before { patch(api_v1_project_task_path(project, task.id + 1), headers: headers) }
 
       it_behaves_like 'not found response'
     end
 
     context 'unauthorized' do
-      before { patch(api_v1_task_path(1)) }
+      before { patch(api_v1_project_task_path(project, 1)) }
 
       it_behaves_like 'unauthorized response'
     end
   end
 
-  describe 'DELETE /api/v1/tasks/:id' do
+  describe 'DELETE /api/v1/projects/:project_id/tasks/:id' do
     context 'success' do
       let(:task) { create(:task, project: project) }
 
-      before { delete(api_v1_task_path(task), headers: headers, params: params) }
+      before { delete(api_v1_project_task_path(project, task), headers: headers) }
 
       it_behaves_like 'successful response'
     end
 
     context 'forbidden' do
-      let(:task)   { create(:task) }
-      let(:params) { { project_id: task.project.id } }
+      let(:task)    { create(:task) }
+      let(:project) { task.project.id }
 
-      before { delete(api_v1_task_path(task), headers: headers, params: params) }
+      before { delete(api_v1_project_task_path(project, task), headers: headers) }
 
       it_behaves_like 'forbidden response'
     end
@@ -151,13 +150,13 @@ RSpec.describe 'Tasks management', type: :request do
     context 'not found' do
       let(:task) { create(:task, project: project) }
 
-      before { delete(api_v1_task_path(task.id + 1), headers: headers, params: params) }
+      before { delete(api_v1_project_task_path(project, task.id + 1), headers: headers) }
 
       it_behaves_like 'not found response'
     end
 
     context 'unauthorized' do
-      before { delete api_v1_task_path(1) }
+      before { delete api_v1_project_task_path(project, 1) }
 
       it_behaves_like 'unauthorized response'
     end

@@ -1,11 +1,9 @@
 class Task < ApplicationRecord
-  include RankedModel
-  
   belongs_to :project
 
   has_many :comments, dependent: :destroy
 
   validates :name, presence: true
 
-  ranks :priority, with_same: :project_id
+  acts_as_list column: :priority, scope: :project
 end

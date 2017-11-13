@@ -1,15 +1,7 @@
 class User < ActiveRecord::Base
   has_many :projects, dependent: :destroy
 
-  validates :email,
-    length: { in: 3..50 }
-  validates :password,
-    presence:     true,
-    confirmation: true,
-    format:       { with: /\A[[:alnum:]]+\z/ },
-    length:       { is: 8 }
-
-  devise :database_authenticatable, :registerable
+  devise :database_authenticatable, :registerable, :validatable
 
   include DeviseTokenAuth::Concerns::User
 end
