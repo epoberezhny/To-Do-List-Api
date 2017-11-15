@@ -13,7 +13,7 @@ class Api::V1::ProjectsController < Api::V1::ApplicationController
     if @project.save
       render json: @project, status: :created, location: api_v1_project_url(@project)
     else
-      render json: @project.errors, status: :unprocessable_entity
+      render json: @project.errors.full_messages, status: :unprocessable_entity
     end
   end
 
@@ -21,7 +21,7 @@ class Api::V1::ProjectsController < Api::V1::ApplicationController
     if @project.update(project_params)
       render json: @project
     else
-      render json: @project.errors, status: :unprocessable_entity
+      render json: @project.errors.full_messages, status: :unprocessable_entity
     end
   end
 
