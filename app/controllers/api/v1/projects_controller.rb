@@ -10,19 +10,11 @@ class Api::V1::ProjectsController < Api::V1::ApplicationController
   end
 
   def create
-    if @project.save
-      render json: @project, status: :created, location: api_v1_project_url(@project)
-    else
-      render json: @project.errors.full_messages, status: :unprocessable_entity
-    end
+    save_record record: @project, location: -> { api_v1_project_url(@project) }
   end
 
   def update
-    if @project.update(project_params)
-      render json: @project
-    else
-      render json: @project.errors.full_messages, status: :unprocessable_entity
-    end
+    update_record record: @project, params: project_params
   end
 
   def destroy

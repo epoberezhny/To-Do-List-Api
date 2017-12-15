@@ -11,19 +11,11 @@ class Api::V1::TasksController < Api::V1::ApplicationController
   end
 
   def create
-    if @task.save
-      render json: @task, status: :created, location: api_v1_project_task_url(@project, @task)
-    else
-      render json: @task.errors.full_messages, status: :unprocessable_entity
-    end
+    save_record record: @task, location: -> { api_v1_project_task_url(@project, @task) }
   end
 
   def update
-    if @task.update(task_params)
-      render json: @task
-    else
-      render json: @task.errors.full_messages, status: :unprocessable_entity
-    end
+    update_record record: @task, params: task_params
   end
 
   def destroy

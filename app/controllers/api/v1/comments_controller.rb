@@ -12,22 +12,16 @@ class Api::V1::CommentsController < Api::V1::ApplicationController
   end
 
   def create
-    if @comment.save
-      @comment.reload
-      render json: @comment,
-             status: :created,
-             location: api_v1_project_task_comment_url(@project, @task, @comment)
-    else
-      render json: @comment.errors.full_messages, status: :unprocessable_entity
+    save_record(
+      record: @comment, 
+      location: -> { api_v1_project_task_comment_url(@project, @task, @comment) }
+    ) do |comment|
+      comment.reload
     end
   end
 
   def update
-    if @comment.update(comment_params)
-      render json: @comment
-    else
-      render json: @comment.errors.full_messages, status: :unprocessable_entity
-    end
+    update_record record: @comment, params: comment_params
   end
 
   def destroy
