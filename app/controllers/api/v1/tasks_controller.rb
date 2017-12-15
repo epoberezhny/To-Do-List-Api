@@ -11,11 +11,11 @@ class Api::V1::TasksController < Api::V1::ApplicationController
   end
 
   def create
-    save_record record: @task, location: -> { api_v1_project_task_url(@project, @task) }
+    process_record @task, location: -> { api_v1_project_task_url(@project, @task) }
   end
 
   def update
-    update_record record: @task, params: task_params
+    process_record @task, params: task_params
   end
 
   def destroy

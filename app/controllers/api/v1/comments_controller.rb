@@ -12,16 +12,15 @@ class Api::V1::CommentsController < Api::V1::ApplicationController
   end
 
   def create
-    save_record(
-      record: @comment, 
-      location: -> { api_v1_project_task_comment_url(@project, @task, @comment) }
-    ) do |comment|
+    location_lambda = -> { api_v1_project_task_comment_url(@project, @task, @comment) }
+    
+    process_record @comment, location: location_lambda do |comment|
       comment.reload
     end
   end
 
   def update
-    update_record record: @comment, params: comment_params
+    process_record @comment, params: comment_params
   end
 
   def destroy
