@@ -1,0 +1,27 @@
+{
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "done",
+    "priority",
+    "deadline"
+  ],
+  "properties": {
+    "id": {
+      "type": "integer"
+    },
+    "name": {
+      "type": "string"
+    },
+    "done": {
+      "type": "boolean"
+    },
+    "priority": {
+      "type": "integer"
+    },
+    "deadline": {
+      "type": "datetime"
+    }
+  }
+}
