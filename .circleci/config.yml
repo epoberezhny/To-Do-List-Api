@@ -1,0 +1,49 @@
+version: 2
+
+jobs:
+  build:
+    docker:
+      - image: circleci/ruby:2.5.1
+        environment:
+          RAILS_ENV: test
+
+      - image: circleci/postgres:10
+        environment:
+          POSTGRES_USER: todolist
+          POSTGRES_PASSWORD: todolist
+          POSTGRES_DB: To_Do_List_Api_test
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - bundle-{{ checksum "Gemfile.lock" }}
+
+      - run:
+          name: Bundle Install
+          command: bundle i --jobs 3 --retry 3 --path vendor/bundle
+
+      - save_cache:
+          key: bundle-{{ checksum "Gemfile.lock" }}
+          paths:
+            - vendor/bundle
+
+      - run:
+          name: Wait for DB
+          command: dockerize -wait tcp://localhost:5432 -timeout 15s
+
+      - run:
+          name: Database setup
+          command: bin/rails db:schema:load --trace
+
+      - run:
+          name: Run rspec in parallel
+          command: |
+            bundle exec rspec --profile 10 \
+                              --format RspecJunitFormatter \
+                              --out test_results/rspec.xml \
+                              --format progress
+
+      - store_test_results:
+          path: test_results
