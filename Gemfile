@@ -32,6 +32,7 @@ group :test do
   gem 'json_matchers',         '~> 0.7.2'
   gem 'spring-commands-rspec', '~> 1.0',  '>= 1.0.4'
   gem 'shoulda-matchers',      '~> 3.1',  '>= 3.1.2'
+  gem 'rspec_junit_formatter'
 end
 
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
