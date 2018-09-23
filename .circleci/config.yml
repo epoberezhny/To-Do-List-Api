@@ -38,7 +38,7 @@ jobs:
           command: bin/rails db:schema:load --trace
 
       - run:
-          name: Run rspec in parallel
+          name: Run rspec
           command: |
             bundle exec rspec --profile 10 \
                               --format RspecJunitFormatter \
