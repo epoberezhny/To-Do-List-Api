@@ -27,7 +27,7 @@ RSpec.describe User, type: :model do
     end
 
     context 'uniqueness' do
-      it { expect(user).to validate_uniqueness_of(:email).case_insensitive }
+      it { expect(user).to validate_uniqueness_of(:email).scoped_to(:provider).case_insensitive }
     end
 
     # context 'format' do
