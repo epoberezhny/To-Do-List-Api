@@ -10,6 +10,7 @@ ruby '2.5.1'
 gem 'rails', '~> 5.1.4'
 gem 'pg',    '~> 0.18'
 gem 'puma',  '~> 3.7'
+gem 'oj'
 
 gem 'devise_token_auth', '~> 0.1.42'
 gem 'cancancan',         '~> 2.0'
