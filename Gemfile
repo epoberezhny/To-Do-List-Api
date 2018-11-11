@@ -22,6 +22,8 @@ gem 'cloudinary',  '~> 1.8', '>= 1.8.1'
 
 gem 'acts_as_list', '~> 0.9.9'
 
+gem 'newrelic_rpm'
+
 group :development, :test do
   gem 'spring'
   gem 'figaro'
