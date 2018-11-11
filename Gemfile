@@ -24,6 +24,7 @@ gem 'acts_as_list', '~> 0.9.9'
 
 gem 'newrelic_rpm'
 gem 'rollbar'
+gem "sentry-raven"
 
 group :development, :test do
   gem 'spring'
