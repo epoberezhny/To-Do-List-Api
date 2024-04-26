@@ -1,6 +1,7 @@
 {
+  "id": "file:/comments.json#",
   "type": "array",
   "items": {
-    "$ref": "comment.json"
+    "$ref": "file:/comment.json#"
   }
 }

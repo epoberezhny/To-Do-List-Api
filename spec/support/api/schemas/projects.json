@@ -1,6 +1,7 @@
 {
+  "id": "file:/projects.json#",
   "type": "array",
   "items": {
-    "$ref": "project.json"
+    "$ref": "file:/project.json#"
   }
 }

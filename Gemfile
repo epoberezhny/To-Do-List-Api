@@ -27,16 +27,16 @@ gem 'rollbar'
 gem "sentry-raven"
 
 group :development, :test do
-  gem 'spring'
+  gem 'spring', '~> 2.0'
   gem 'figaro'
 end
 
 group :test do
-  gem 'rspec-rails',           '~> 3.7'
-  gem 'factory_bot_rails',     '~> 6.2.0'
-  gem 'json_matchers',         '~> 0.7.2'
-  gem 'spring-commands-rspec', '~> 1.0',  '>= 1.0.4'
-  gem 'shoulda-matchers',      '~> 3.1',  '>= 3.1.2'
+  gem 'rspec-rails'
+  gem 'factory_bot_rails', '~> 6.2.0'
+  gem 'json_matchers'
+  gem 'spring-commands-rspec'
+  gem 'shoulda-matchers'
   gem 'rspec_junit_formatter'
 end
 
