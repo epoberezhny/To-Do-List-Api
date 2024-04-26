@@ -33,7 +33,7 @@ end
 
 group :test do
   gem 'rspec-rails',           '~> 3.7'
-  gem 'factory_girl_rails',    '~> 4.8'
+  gem 'factory_bot_rails',     '~> 6.2.0'
   gem 'json_matchers',         '~> 0.7.2'
   gem 'spring-commands-rspec', '~> 1.0',  '>= 1.0.4'
   gem 'shoulda-matchers',      '~> 3.1',  '>= 3.1.2'
