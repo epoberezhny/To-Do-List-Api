@@ -7,7 +7,8 @@ end
 
 ruby '2.5.1'
 
-gem 'rails', '~> 5.1.4'
+gem 'rails', '~> 5.2.0'
+gem 'bootsnap', require: false
 gem 'pg'
 gem 'puma'
 gem 'oj'
@@ -27,7 +28,8 @@ gem 'rollbar'
 gem "sentry-raven"
 
 group :development, :test do
-  gem 'spring', '~> 2.0'
+  gem 'listen', require: false
+  gem 'spring'
   gem 'figaro'
 end
 
