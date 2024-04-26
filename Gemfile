@@ -8,19 +8,19 @@ end
 ruby '2.5.1'
 
 gem 'rails', '~> 5.1.4'
-gem 'pg',    '~> 0.18'
-gem 'puma',  '~> 3.7'
+gem 'pg'
+gem 'puma'
 gem 'oj'
 
-gem 'devise_token_auth', '~> 0.1.42'
-gem 'cancancan',         '~> 2.0'
+gem 'devise_token_auth'
+gem 'cancancan'
 
 gem 'rack-cors'
 
-gem 'carrierwave', '~> 1.2', '>= 1.2.1'
-gem 'cloudinary',  '~> 1.8', '>= 1.8.1'
+gem 'carrierwave'
+gem 'cloudinary'
 
-gem 'acts_as_list', '~> 0.9.9'
+gem 'acts_as_list'
 
 gem 'newrelic_rpm'
 gem 'rollbar'
