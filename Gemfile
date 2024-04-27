@@ -7,7 +7,7 @@ end
 
 ruby '2.7.8'
 
-gem 'rails', '~> 6.1.0'
+gem 'rails', '~> 7.0.0'
 gem 'bootsnap', require: false
 gem 'pg'
 gem 'puma'
@@ -28,6 +28,7 @@ gem 'rollbar'
 gem "sentry-raven"
 
 group :development, :test do
+  gem 'pry-byebug'
   gem 'listen', require: false
   gem 'spring'
   gem 'figaro'

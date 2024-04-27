@@ -10,8 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2017_10_29_215645) do
-
+ActiveRecord::Schema[7.0].define(version: 2017_10_29_215645) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -19,16 +18,16 @@ ActiveRecord::Schema.define(version: 2017_10_29_215645) do
     t.text "text"
     t.bigint "task_id"
     t.string "attachment"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.index ["task_id"], name: "index_comments_on_task_id"
   end
 
   create_table "projects", force: :cascade do |t|
     t.string "name"
     t.bigint "user_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.index ["user_id"], name: "index_projects_on_user_id"
   end
 
@@ -37,10 +36,10 @@ ActiveRecord::Schema.define(version: 2017_10_29_215645) do
     t.bigint "project_id"
     t.boolean "done", default: false, null: false
     t.integer "priority"
-    t.datetime "deadline"
+    t.datetime "deadline", precision: nil
     t.integer "comments_count", default: 0
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.index ["project_id"], name: "index_tasks_on_project_id"
   end
 
@@ -50,8 +49,8 @@ ActiveRecord::Schema.define(version: 2017_10_29_215645) do
     t.string "encrypted_password", default: "", null: false
     t.string "email"
     t.json "tokens"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true
   end
