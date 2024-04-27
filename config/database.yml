@@ -4,9 +4,9 @@ default: &default
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 
 local_default: &local_default
-  username: todolist
-  password: todolist
-  host: localhost
+  username: <%= ENV.fetch('DB_USER', 'postgres') %>
+  password: <%= ENV.fetch('DB_PASS', 'postgres') %>
+  host: <%= ENV.fetch('DB_HOST', 'localhost') %>
 
 development:
   <<: *default

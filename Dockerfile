@@ -1,5 +1,5 @@
-ARG RUBY_VERSION=2.5.1
-ARG DEBIAN_RELEASE=stretch
+ARG RUBY_VERSION=2.7.8
+ARG DEBIAN_RELEASE=bullseye
 ARG ARCH=amd64
 
 # SHARED BUILD STAGE ==========================================================
@@ -33,12 +33,7 @@ WORKDIR $APP_ROOT
 # - install the packages
 FROM base AS intermediate
 
-ARG
-
 ARG DEBIAN_RELEASE
-
-RUN echo "deb http://archive.debian.org/debian $DEBIAN_RELEASE main" > /etc/apt/sources.list && \
-  echo "deb http://archive.debian.org/debian-security $DEBIAN_RELEASE/updates main" >> /etc/apt/sources.list
 
 # Install packages necessary for compiling native extensions
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
@@ -49,7 +44,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   apt-get update -qq && apt-get upgrade -yq && \
   DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends \
     build-essential \
-    libpq-dev
+    libpq-dev \
+    git
 
 COPY Gemfile* .ruby-version ./
 
@@ -59,11 +55,8 @@ RUN bundle i
 # - installs packages
 FROM base AS builder
 
-ARG PG_MAJOR=14
+ARG PG_MAJOR=16
 ARG DEBIAN_RELEASE
-
-RUN echo "deb http://archive.debian.org/debian $DEBIAN_RELEASE main" > /etc/apt/sources.list && \
-  echo "deb http://archive.debian.org/debian-security $DEBIAN_RELEASE/updates main" >> /etc/apt/sources.list
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   --mount=type=cache,target=/var/lib/apt,sharing=locked \
@@ -72,13 +65,12 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache; \
   apt-get update -qq && \
   DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends \
-    apt-transport-https \
-    gnupg2 \
+    gnupg \
     wget
 
 # Add PostgreSQL to sources list
 RUN wget -q -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
-  echo "deb https://apt-archive.postgresql.org/pub/repos/apt $DEBIAN_RELEASE-pgdg main" > /etc/apt/sources.list.d/pgdg.list
+  echo "deb https://apt.postgresql.org/pub/repos/apt $DEBIAN_RELEASE-pgdg main" > /etc/apt/sources.list.d/pgdg.list
 
 # Update system
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
@@ -99,7 +91,9 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   --mount=type=cache,target=/var/lib/apt,sharing=locked \
   --mount=type=tmpfs,target=/var/log \
   apt-get update -qq && apt-get upgrade -yq && \
-  DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends build-essential
+  DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends \
+    build-essential \
+    git
 
 FROM builder as prod
 

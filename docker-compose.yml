@@ -1,0 +1,62 @@
+volumes:
+  bundle:
+  file_uploads:
+
+networks:
+  shared:
+    name: todolist_network
+    external: true
+
+x-app: &app
+  build:
+    context: .
+    dockerfile: Dockerfile
+    target: dev
+    # args:
+      # ARCH: arm64
+      # BUNDLE_WITHOUT: development:test
+  image: todolistapi
+  tmpfs:
+    - /tmp
+    - /app/tmp/pids
+
+x-backend: &backend
+  <<: *app
+  stdin_open: true
+  tty: true
+  volumes:
+    - .:/var/www/todolistapi
+    - ./.bash_history.docker:/root/.bash_history
+    - bundle:/var/www/todolistapi/vendor/bundle
+    - file_uploads:/var/www/todolistapi/public/uploads
+  environment:
+    RAILS_ENV: ${RAILS_ENV:-development}
+    DB_HOST: postgres
+
+    # AWS_ACCESS_KEY_ID:
+    # AWS_SECRET_ACCESS_KEY:
+    # AWS_DEFAULT_REGION:
+    # AWS_REGION:
+  depends_on:
+    - postgres
+  networks:
+    - default
+    - shared
+
+services:
+  runner:
+    <<: *backend
+    command: bash
+
+  app:
+    <<: *backend
+    command: bin/rails s -b 0.0.0.0
+    ports:
+      - 3000:3000
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: postgres
+    # ports:
+    #   - 5432:5432
