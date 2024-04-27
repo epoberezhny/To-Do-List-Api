@@ -7,13 +7,13 @@ end
 
 ruby '2.7.8'
 
-gem 'rails', '~> 7.0.0'
+gem 'rails', '~> 7.1.0'
 gem 'bootsnap', require: false
 gem 'pg'
 gem 'puma'
 gem 'oj'
 
-gem 'devise_token_auth'
+gem 'devise_token_auth', github: 'lynndylanhurley/devise_token_auth'
 gem 'cancancan'
 
 gem 'rack-cors'
