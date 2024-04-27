@@ -1,5 +1,5 @@
-ARG RUBY_VERSION=2.7.8
-ARG DEBIAN_RELEASE=bullseye
+ARG RUBY_VERSION=3.3.1
+ARG DEBIAN_RELEASE=bookworm
 ARG ARCH=amd64
 
 # SHARED BUILD STAGE ==========================================================

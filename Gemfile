@@ -5,7 +5,7 @@ git_source(:github) do |repo_name|
   "https://github.com/#{repo_name}.git"
 end
 
-ruby '2.7.8'
+ruby '3.3.1'
 
 gem 'rails', '~> 7.1.0'
 gem 'bootsnap', require: false
@@ -36,7 +36,7 @@ end
 
 group :test do
   gem 'rspec-rails'
-  gem 'factory_bot_rails', '~> 6.2.0'
+  gem 'factory_bot_rails'
   gem 'json_matchers'
   gem 'spring-commands-rspec'
   gem 'shoulda-matchers'
