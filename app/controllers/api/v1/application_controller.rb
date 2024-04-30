@@ -1,31 +1,37 @@
-class Api::V1::ApplicationController < ApplicationController
-  include DeviseTokenAuth::Concerns::SetUserByToken
-  include CanCan::ControllerAdditions
+# frozen_string_literal: true
 
-  before_action :authenticate_user!
+module Api
+  module V1
+    class ApplicationController < ApplicationController
+      include DeviseTokenAuth::Concerns::SetUserByToken
+      include CanCan::ControllerAdditions
 
-  rescue_from CanCan::AccessDenied do
-    head :forbidden
-  end
+      before_action :authenticate_user!
 
-  rescue_from ActiveRecord::RecordNotFound do
-    head :not_found
-  end
+      rescue_from CanCan::AccessDenied do
+        head :forbidden
+      end
 
-  private
+      rescue_from ActiveRecord::RecordNotFound do
+        head :not_found
+      end
 
-  def process_record(record, **options)
-    new_record = record.new_record?
+      private
 
-    record.assign_attributes(options[:params]) unless new_record
+      def process_record(record, **options)
+        new_record = record.new_record?
 
-    if record.save
-      render json: record and return unless new_record
-      
-      yield record if block_given?
-      render json: record, status: :created, location: options[:location].call
-    else
-      render json: record.errors.full_messages, status: :unprocessable_entity
+        record.assign_attributes(options[:params]) unless new_record
+
+        if record.save
+          render json: record and return unless new_record
+
+          yield record if block_given?
+          render json: record, status: :created, location: options[:location].call
+        else
+          render json: record.errors.full_messages, status: :unprocessable_entity
+        end
+      end
     end
   end
 end

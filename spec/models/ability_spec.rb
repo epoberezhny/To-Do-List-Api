@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 RSpec.describe 'Ability' do
-  describe "abilities of loggined user" do
+  describe 'abilities of loggined user' do
     subject(:ability)   { Ability.new(user) }
 
     let(:user)          { build_stubbed(:user) }
@@ -13,19 +15,19 @@ RSpec.describe 'Ability' do
     let(:comment)       { build_stubbed(:comment, task: task) }
     let(:other_comment) { build_stubbed(:comment, task: other_task) }
 
-    context 'for projects' do
+    describe 'projects' do
       it { is_expected.to be_able_to(:manage, project) }
 
       it { is_expected.not_to be_able_to(:manage, other_project) }
     end
 
-    context 'for tasks' do
+    describe 'for tasks' do
       it { is_expected.to be_able_to(:manage, task) }
 
       it { is_expected.not_to be_able_to(:manage, other_task) }
     end
 
-    context 'for comments' do
+    describe 'for comments' do
       it { is_expected.to be_able_to(:manage, comment) }
 
       it { is_expected.not_to be_able_to(:manage, other_comment) }

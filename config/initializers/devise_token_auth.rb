@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 DeviseTokenAuth.setup do |config|
   require 'devise/orm/active_record'
 
-  config.token_lifespan = 1.weeks
+  config.token_lifespan = 1.week
 
   config.max_number_of_devices = 5
 

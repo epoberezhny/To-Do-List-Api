@@ -1,29 +1,35 @@
-class Api::V1::ProjectsController < Api::V1::ApplicationController
-  load_and_authorize_resource
+# frozen_string_literal: true
 
-  def index
-    render json: @projects
-  end
+module Api
+  module V1
+    class ProjectsController < Api::V1::ApplicationController
+      load_and_authorize_resource
 
-  def show
-    render json: @project
-  end
+      def index
+        render json: @projects
+      end
 
-  def create
-    process_record @project, location: -> { api_v1_project_url(@project) }
-  end
+      def show
+        render json: @project
+      end
 
-  def update
-    process_record @project, params: project_params
-  end
+      def create
+        process_record @project, location: -> { api_v1_project_url(@project) }
+      end
 
-  def destroy
-    @project.destroy
-  end
+      def update
+        process_record @project, params: project_params
+      end
 
-  private
+      def destroy
+        @project.destroy
+      end
 
-  def project_params
-    params.permit(:name)
+      private
+
+      def project_params
+        params.permit(:name)
+      end
+    end
   end
 end

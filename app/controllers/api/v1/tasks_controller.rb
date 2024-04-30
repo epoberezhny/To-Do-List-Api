@@ -1,30 +1,36 @@
-class Api::V1::TasksController < Api::V1::ApplicationController
-  load_and_authorize_resource :project
-  load_and_authorize_resource :task, through: :project
+# frozen_string_literal: true
 
-  def index
-    render json: @tasks
-  end
+module Api
+  module V1
+    class TasksController < Api::V1::ApplicationController
+      load_and_authorize_resource :project
+      load_and_authorize_resource :task, through: :project
 
-  def show
-    render json: @task
-  end
+      def index
+        render json: @tasks
+      end
 
-  def create
-    process_record @task, location: -> { api_v1_project_task_url(@project, @task) }
-  end
+      def show
+        render json: @task
+      end
 
-  def update
-    process_record @task, params: task_params
-  end
+      def create
+        process_record @task, location: -> { api_v1_project_task_url(@project, @task) }
+      end
 
-  def destroy
-    @task.destroy
-  end
+      def update
+        process_record @task, params: task_params
+      end
 
-  private
+      def destroy
+        @task.destroy
+      end
 
-  def task_params
-    params.permit(:name, :done, :priority, :deadline)
+      private
+
+      def task_params
+        params.permit(:name, :done, :priority, :deadline)
+      end
+    end
   end
 end

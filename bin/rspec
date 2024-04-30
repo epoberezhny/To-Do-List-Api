@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
-load File.expand_path("spring", __dir__)
+# frozen_string_literal: true
+
+load File.expand_path('spring', __dir__)
 
 # frozen_string_literal: true
 #
@@ -9,11 +11,11 @@ load File.expand_path("spring", __dir__)
 # this file is here to facilitate running it.
 #
 
-require "pathname"
-ENV["BUNDLE_GEMFILE"] ||= File.expand_path("../../Gemfile",
-  Pathname.new(__FILE__).realpath)
+require 'pathname'
+ENV['BUNDLE_GEMFILE'] ||= File.expand_path('../../Gemfile',
+                                           Pathname.new(__FILE__).realpath)
 
-require "rubygems"
-require "bundler/setup"
+require 'rubygems'
+require 'bundler/setup'
 
-load Gem.bin_path("rspec-core", "rspec")
+load Gem.bin_path('rspec-core', 'rspec')

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples 'successful response' do
   it 'returns a success response' do
     expect(response).to be_successful

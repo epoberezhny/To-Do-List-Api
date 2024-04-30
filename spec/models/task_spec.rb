@@ -1,21 +1,23 @@
-RSpec.describe Task, type: :model do
-  context 'associations' do
-    context 'belongs to' do
+# frozen_string_literal: true
+
+RSpec.describe Task do
+  describe 'associations' do
+    describe 'belongs to' do
       it { is_expected.to belong_to(:project) }
     end
 
-    context 'has many' do
+    describe 'has many' do
       it { is_expected.to have_many(:comments).dependent(:destroy) }
     end
   end
 
-  context 'validations' do
-    context 'presence' do
-      it { is_expected.to validate_presence_of(:name) }      
+  describe 'validations' do
+    describe 'presence' do
+      it { is_expected.to validate_presence_of(:name) }
     end
   end
 
-  context 'columns' do
+  describe 'columns' do
     it { is_expected.to have_db_column(:comments_count) }
   end
 end
