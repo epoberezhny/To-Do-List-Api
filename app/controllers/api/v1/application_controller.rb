@@ -3,7 +3,6 @@
 module Api
   module V1
     class ApplicationController < ApplicationController
-      include DeviseTokenAuth::Concerns::SetUserByToken
       include CanCan::ControllerAdditions
 
       before_action :authenticate_user!

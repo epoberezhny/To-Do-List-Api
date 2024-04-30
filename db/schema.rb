@@ -25,11 +25,8 @@ ActiveRecord::Schema[7.1].define(version: 2017_10_29_215645) do
 
   create_table "projects", force: :cascade do |t|
     t.string "name"
-    t.bigint "user_id"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.index ["user_id", "name"], name: "index_projects_on_user_id_and_name", unique: true
-    t.index ["user_id"], name: "index_projects_on_user_id"
   end
 
   create_table "tasks", force: :cascade do |t|
@@ -44,19 +41,6 @@ ActiveRecord::Schema[7.1].define(version: 2017_10_29_215645) do
     t.index ["project_id"], name: "index_tasks_on_project_id"
   end
 
-  create_table "users", force: :cascade do |t|
-    t.string "provider", default: "email", null: false
-    t.string "uid", default: "", null: false
-    t.string "encrypted_password", default: "", null: false
-    t.string "email"
-    t.json "tokens"
-    t.datetime "created_at", precision: nil, null: false
-    t.datetime "updated_at", precision: nil, null: false
-    t.index ["email"], name: "index_users_on_email", unique: true
-    t.index ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true
-  end
-
   add_foreign_key "comments", "tasks"
-  add_foreign_key "projects", "users"
   add_foreign_key "tasks", "projects"
 end

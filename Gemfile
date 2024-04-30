@@ -16,7 +16,6 @@ gem 'puma'
 gem 'rails', '~> 7.1.0'
 
 gem 'cancancan'
-gem 'devise_token_auth', github: 'lynndylanhurley/devise_token_auth'
 
 gem 'rack-cors'
 
