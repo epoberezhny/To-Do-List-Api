@@ -27,7 +27,6 @@ gem 'acts_as_list'
 
 gem 'newrelic_rpm'
 gem 'rollbar'
-gem 'sentry-raven'
 
 group :development, :test do
   gem 'figaro'
