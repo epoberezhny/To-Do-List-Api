@@ -2,10 +2,13 @@
 
 RSpec.describe Api::V1::CommentsController do
   let(:user)    { create(:user) }
-  let(:project) { create(:project, user: user) }
-  let(:task)    { create(:task, project: project) }
+  let(:project) { create(:project, user:) }
+  let(:task)    { create(:task, project:) }
 
-  before { request.headers.merge!(user.create_new_auth_token) }
+  before do
+    login(user:)
+    request.headers.merge!('Authorization' => "Bearer #{access_token(user:)}")
+  end
 
   describe 'POST #create' do
     let(:valid_attributes) { attributes_for(:comment, project_id: project.id, task_id: task.id) }
@@ -18,7 +21,7 @@ RSpec.describe Api::V1::CommentsController do
   end
 
   describe 'PATCH #update' do
-    let(:comment)        { create(:comment, task: task) }
+    let(:comment)        { create(:comment, task:) }
     let(:new_attributes) do
       attributes_for(:comment, text: 'New name', project_id: project.id, task_id: task.id)
     end
@@ -31,7 +34,7 @@ RSpec.describe Api::V1::CommentsController do
   end
 
   describe 'DELETE #destroy' do
-    let!(:comment) { create(:comment, task: task) }
+    let!(:comment) { create(:comment, task:) }
 
     it 'destroys the requested comment' do
       expect do

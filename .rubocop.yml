@@ -30,10 +30,18 @@ Layout/LineLength:
     - db/*
     - config/initializers/*
     - config/environments/*
-
+    - app/misc/*
 
 Layout/FirstArrayElementIndentation:
   EnforcedStyle: consistent
+
+Metrics/AbcSize:
+  Exclude:
+    - db/**/*
+
+Metrics/MethodLength:
+  Exclude:
+    - db/**/*
 
 RSpec/NestedGroups:
   Max: 5

@@ -6,13 +6,13 @@ RSpec.describe 'Ability' do
 
     let(:user)          { build_stubbed(:user) }
 
-    let(:project)       { build_stubbed(:project, user: user) }
+    let(:project)       { build_stubbed(:project, user:) }
     let(:other_project) { build_stubbed(:project) }
 
-    let(:task)          { build_stubbed(:task, project: project) }
+    let(:task)          { build_stubbed(:task, project:) }
     let(:other_task)    { build_stubbed(:task, project: other_project) }
 
-    let(:comment)       { build_stubbed(:comment, task: task) }
+    let(:comment)       { build_stubbed(:comment, task:) }
     let(:other_comment) { build_stubbed(:comment, task: other_task) }
 
     describe 'projects' do

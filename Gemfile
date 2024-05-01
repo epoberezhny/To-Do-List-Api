@@ -16,6 +16,8 @@ gem 'puma'
 gem 'rails', '~> 7.1.0'
 
 gem 'cancancan'
+gem 'jwt'
+gem 'rodauth-rails'
 
 gem 'rack-cors'
 

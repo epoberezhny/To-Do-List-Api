@@ -2,14 +2,16 @@
 
 RSpec.describe 'Tasks management' do
   let(:user)    { create(:user) }
-  let(:headers) { user.create_new_auth_token }
-  let(:project) { create(:project, user: user) }
+  let(:headers) { { 'Authorization' => "Bearer #{access_token(user:)}" } }
+  let(:project) { create(:project, user:) }
+
+  before { login(user:) }
 
   describe 'GET api/v1/projects/:project_id/tasks' do
     describe 'success' do
-      let!(:task) { create_list(:task, 3, project: project) }
+      let!(:task) { create_list(:task, 3, project:) }
 
-      before { get(api_v1_project_tasks_path(project), headers: headers) }
+      before { get(api_v1_project_tasks_path(project), headers:) }
 
       include_examples 'match schema', 'tasks'
 
@@ -25,9 +27,9 @@ RSpec.describe 'Tasks management' do
 
   describe 'GET /api/v1/projects/:project_id/tasks/:id' do
     describe 'success' do
-      let(:task) { create(:task, project: project) }
+      let(:task) { create(:task, project:) }
 
-      before { get(api_v1_project_task_path(project, task), headers: headers) }
+      before { get(api_v1_project_task_path(project, task), headers:) }
 
       include_examples 'match schema', 'task'
 
@@ -38,15 +40,15 @@ RSpec.describe 'Tasks management' do
       let(:task)    { create(:task) }
       let(:project) { task.project }
 
-      before { get(api_v1_project_task_path(project, task), headers: headers) }
+      before { get(api_v1_project_task_path(project, task), headers:) }
 
       it_behaves_like 'forbidden response'
     end
 
     describe 'not found' do
-      let(:task) { create(:task, project: project) }
+      let(:task) { create(:task, project:) }
 
-      before { get(api_v1_project_task_path(project, task.id + 1), headers: headers) }
+      before { get(api_v1_project_task_path(project, task.id + 1), headers:) }
 
       it_behaves_like 'not found response'
     end
@@ -62,7 +64,7 @@ RSpec.describe 'Tasks management' do
     describe 'created' do
       let(:params) { attributes_for(:task) }
 
-      before { post(api_v1_project_tasks_path(project), headers: headers, params: params) }
+      before { post(api_v1_project_tasks_path(project), headers:, params:) }
 
       include_examples 'match schema', 'task'
 
@@ -74,7 +76,7 @@ RSpec.describe 'Tasks management' do
     describe 'unprocessable' do
       let(:params) { attributes_for(:task, name: '') }
 
-      before { post(api_v1_project_tasks_path(project), headers: headers, params: params) }
+      before { post(api_v1_project_tasks_path(project), headers:, params:) }
 
       it_behaves_like 'unprocessable response'
     end
@@ -88,10 +90,10 @@ RSpec.describe 'Tasks management' do
 
   describe 'PATCH /api/v1/projects/:project_id/tasks/:id' do
     describe 'success' do
-      let(:task)   { create(:task, project: project) }
+      let(:task)   { create(:task, project:) }
       let(:params) { attributes_for(:task, name: 'New name') }
 
-      before { patch(api_v1_project_task_path(project, task), headers: headers, params: params) }
+      before { patch(api_v1_project_task_path(project, task), headers:, params:) }
 
       include_examples 'match schema', 'task'
 
@@ -99,10 +101,10 @@ RSpec.describe 'Tasks management' do
     end
 
     describe 'unprocessable' do
-      let(:task)   { create(:task, project: project) }
+      let(:task)   { create(:task, project:) }
       let(:params) { attributes_for(:task, name: '') }
 
-      before { patch(api_v1_project_task_path(project, task), headers: headers, params: params) }
+      before { patch(api_v1_project_task_path(project, task), headers:, params:) }
 
       it_behaves_like 'unprocessable response'
     end
@@ -111,15 +113,15 @@ RSpec.describe 'Tasks management' do
       let(:task)    { create(:task) }
       let(:project) { task.project }
 
-      before { patch(api_v1_project_task_path(project, task), headers: headers) }
+      before { patch(api_v1_project_task_path(project, task), headers:) }
 
       it_behaves_like 'forbidden response'
     end
 
     describe 'not found' do
-      let(:task) { create(:task, project: project) }
+      let(:task) { create(:task, project:) }
 
-      before { patch(api_v1_project_task_path(project, task.id + 1), headers: headers) }
+      before { patch(api_v1_project_task_path(project, task.id + 1), headers:) }
 
       it_behaves_like 'not found response'
     end
@@ -133,9 +135,9 @@ RSpec.describe 'Tasks management' do
 
   describe 'DELETE /api/v1/projects/:project_id/tasks/:id' do
     describe 'success' do
-      let(:task) { create(:task, project: project) }
+      let(:task) { create(:task, project:) }
 
-      before { delete(api_v1_project_task_path(project, task), headers: headers) }
+      before { delete(api_v1_project_task_path(project, task), headers:) }
 
       it_behaves_like 'successful response'
     end
@@ -144,15 +146,15 @@ RSpec.describe 'Tasks management' do
       let(:task)    { create(:task) }
       let(:project) { task.project.id }
 
-      before { delete(api_v1_project_task_path(project, task), headers: headers) }
+      before { delete(api_v1_project_task_path(project, task), headers:) }
 
       it_behaves_like 'forbidden response'
     end
 
     describe 'not found' do
-      let(:task) { create(:task, project: project) }
+      let(:task) { create(:task, project:) }
 
-      before { delete(api_v1_project_task_path(project, task.id + 1), headers: headers) }
+      before { delete(api_v1_project_task_path(project, task.id + 1), headers:) }
 
       it_behaves_like 'not found response'
     end

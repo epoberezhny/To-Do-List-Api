@@ -2,15 +2,17 @@
 
 RSpec.describe 'Comments management' do
   let(:user)    { create(:user) }
-  let(:headers) { user.create_new_auth_token }
-  let(:project) { create(:project, user: user) }
-  let(:task)    { create(:task, project: project) }
+  let(:headers) { { 'Authorization' => "Bearer #{access_token(user:)}" } }
+  let(:project) { create(:project, user:) }
+  let(:task)    { create(:task, project:) }
+
+  before { login(user:) }
 
   describe 'GET api/v1/projects/:project_id/tasks/:task_id/comments' do
     describe 'success' do
-      let!(:comment) { create_list(:comment, 3, task: task) }
+      let!(:comment) { create_list(:comment, 3, task:) }
 
-      before { get(api_v1_project_task_comments_path(project, task), headers: headers) }
+      before { get(api_v1_project_task_comments_path(project, task), headers:) }
 
       include_examples 'match schema', 'comments'
 
@@ -26,9 +28,9 @@ RSpec.describe 'Comments management' do
 
   describe 'GET /api/v1/projects/:project_id/tasks/:task_id/comments/:id' do
     describe 'success' do
-      let(:comment) { create(:comment, task: task) }
+      let(:comment) { create(:comment, task:) }
 
-      before { get(api_v1_project_task_comment_path(project, task, comment), headers: headers) }
+      before { get(api_v1_project_task_comment_path(project, task, comment), headers:) }
 
       include_examples 'match schema', 'comment'
 
@@ -40,16 +42,16 @@ RSpec.describe 'Comments management' do
       let(:task)    { comment.task }
       let(:project) { task.project }
 
-      before { get(api_v1_project_task_comment_path(project, task, comment), headers: headers) }
+      before { get(api_v1_project_task_comment_path(project, task, comment), headers:) }
 
       it_behaves_like 'forbidden response'
     end
 
     describe 'not found' do
-      let(:comment) { create(:comment, task: task) }
+      let(:comment) { create(:comment, task:) }
 
       before do
-        get(api_v1_project_task_comment_path(project, task, comment.id + 1), headers: headers)
+        get(api_v1_project_task_comment_path(project, task, comment.id + 1), headers:)
       end
 
       it_behaves_like 'not found response'
@@ -67,7 +69,7 @@ RSpec.describe 'Comments management' do
       let(:params) { attributes_for(:comment) }
 
       before do
-        post(api_v1_project_task_comments_path(project, task), headers: headers, params: params)
+        post(api_v1_project_task_comments_path(project, task), headers:, params:)
       end
 
       include_examples 'match schema', 'comment'
@@ -81,7 +83,7 @@ RSpec.describe 'Comments management' do
       let(:params) { attributes_for(:comment, text: '') }
 
       before do
-        post(api_v1_project_task_comments_path(project, task), headers: headers, params: params)
+        post(api_v1_project_task_comments_path(project, task), headers:, params:)
       end
 
       it_behaves_like 'unprocessable response'
@@ -96,12 +98,12 @@ RSpec.describe 'Comments management' do
 
   describe 'PATCH /api/v1/projects/:project_id/tasks/:task_id/cooments/:id' do
     describe 'success' do
-      let(:comment) { create(:comment, task: task) }
+      let(:comment) { create(:comment, task:) }
       let(:params)  { attributes_for(:comment, name: 'New name') }
 
       before do
-        patch(api_v1_project_task_comment_path(project, task, comment), headers: headers,
-                                                                        params: params)
+        patch(api_v1_project_task_comment_path(project, task, comment), headers:,
+                                                                        params:)
       end
 
       include_examples 'match schema', 'comment'
@@ -110,12 +112,12 @@ RSpec.describe 'Comments management' do
     end
 
     describe 'unprocessable' do
-      let(:comment) { create(:comment, task: task) }
+      let(:comment) { create(:comment, task:) }
       let(:params)  { attributes_for(:comment, text: '') }
 
       before do
-        patch(api_v1_project_task_comment_path(project, task, comment), headers: headers,
-                                                                        params: params)
+        patch(api_v1_project_task_comment_path(project, task, comment), headers:,
+                                                                        params:)
       end
 
       it_behaves_like 'unprocessable response'
@@ -126,16 +128,16 @@ RSpec.describe 'Comments management' do
       let(:task)    { comment.task }
       let(:project) { task.project }
 
-      before { patch(api_v1_project_task_comment_path(project, task, comment), headers: headers) }
+      before { patch(api_v1_project_task_comment_path(project, task, comment), headers:) }
 
       it_behaves_like 'forbidden response'
     end
 
     describe 'not found' do
-      let(:comment) { create(:comment, task: task) }
+      let(:comment) { create(:comment, task:) }
 
       before do
-        patch(api_v1_project_task_comment_path(project, task, comment.id + 1), headers: headers)
+        patch(api_v1_project_task_comment_path(project, task, comment.id + 1), headers:)
       end
 
       it_behaves_like 'not found response'
@@ -150,9 +152,9 @@ RSpec.describe 'Comments management' do
 
   describe 'DELETE /api/v1/projects/:project_id/tasks/:task_id/comments/:id' do
     describe 'success' do
-      let(:comment) { create(:comment, task: task) }
+      let(:comment) { create(:comment, task:) }
 
-      before { delete(api_v1_project_task_comment_path(project, task, comment), headers: headers) }
+      before { delete(api_v1_project_task_comment_path(project, task, comment), headers:) }
 
       it_behaves_like 'successful response'
     end
@@ -162,16 +164,16 @@ RSpec.describe 'Comments management' do
       let(:task)    { comment.task }
       let(:project) { task.project }
 
-      before { delete(api_v1_project_task_comment_path(project, task, comment), headers: headers) }
+      before { delete(api_v1_project_task_comment_path(project, task, comment), headers:) }
 
       it_behaves_like 'forbidden response'
     end
 
     describe 'not found' do
-      let(:comment) { create(:comment, task: task) }
+      let(:comment) { create(:comment, task:) }
 
       before do
-        delete(api_v1_project_task_comment_path(project, task, comment.id + 1), headers: headers)
+        delete(api_v1_project_task_comment_path(project, task, comment.id + 1), headers:)
       end
 
       it_behaves_like 'not found response'

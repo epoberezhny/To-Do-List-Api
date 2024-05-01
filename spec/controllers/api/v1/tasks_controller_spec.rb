@@ -2,9 +2,12 @@
 
 RSpec.describe Api::V1::TasksController do
   let(:user)    { create(:user) }
-  let(:project) { create(:project, user: user) }
+  let(:project) { create(:project, user:) }
 
-  before { request.headers.merge!(user.create_new_auth_token) }
+  before do
+    login(user:)
+    request.headers.merge!('Authorization' => "Bearer #{access_token(user:)}")
+  end
 
   describe 'POST #create' do
     let(:valid_attributes) { attributes_for(:task, project_id: project.id) }
@@ -17,7 +20,7 @@ RSpec.describe Api::V1::TasksController do
   end
 
   describe 'PATCH #update' do
-    let(:task)           { create(:task, project: project) }
+    let(:task)           { create(:task, project:) }
     let(:new_attributes) { attributes_for(:task, name: 'New name', project_id: project.id) }
 
     it 'updates the requested task' do
@@ -28,7 +31,7 @@ RSpec.describe Api::V1::TasksController do
   end
 
   describe 'DELETE #destroy' do
-    let!(:task) { create(:task, project: project) }
+    let!(:task) { create(:task, project:) }
 
     it 'destroys the requested task' do
       expect do

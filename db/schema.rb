@@ -12,6 +12,7 @@
 
 ActiveRecord::Schema[7.1].define(version: 2017_10_29_215645) do
   # These are extensions that must be enabled in order to support this database
+  enable_extension "citext"
   enable_extension "plpgsql"
 
   create_table "comments", force: :cascade do |t|
@@ -25,8 +26,11 @@ ActiveRecord::Schema[7.1].define(version: 2017_10_29_215645) do
 
   create_table "projects", force: :cascade do |t|
     t.string "name"
+    t.bigint "user_id"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
+    t.index ["user_id", "name"], name: "index_projects_on_user_id_and_name", unique: true
+    t.index ["user_id"], name: "index_projects_on_user_id"
   end
 
   create_table "tasks", force: :cascade do |t|
@@ -41,6 +45,32 @@ ActiveRecord::Schema[7.1].define(version: 2017_10_29_215645) do
     t.index ["project_id"], name: "index_tasks_on_project_id"
   end
 
+  create_table "user_active_session_keys", primary_key: ["user_id", "session_id"], force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "session_id", null: false
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.datetime "last_use", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.index ["user_id"], name: "index_user_active_session_keys_on_user_id"
+  end
+
+  create_table "user_jwt_refresh_keys", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "key", null: false
+    t.datetime "deadline", null: false
+    t.index ["user_id"], name: "index_user_jwt_refresh_keys_on_user_id"
+    t.index ["user_id"], name: "user_jwt_rk_user_id_idx"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.integer "status", default: 1, null: false
+    t.citext "email", null: false
+    t.string "password_hash"
+    t.index ["email"], name: "index_users_on_email", unique: true, where: "(status = ANY (ARRAY[1, 2]))"
+  end
+
   add_foreign_key "comments", "tasks"
+  add_foreign_key "projects", "users"
   add_foreign_key "tasks", "projects"
+  add_foreign_key "user_active_session_keys", "users"
+  add_foreign_key "user_jwt_refresh_keys", "users"
 end

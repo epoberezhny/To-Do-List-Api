@@ -3,7 +3,10 @@
 RSpec.describe Api::V1::ProjectsController do
   let(:user) { create(:user) }
 
-  before { request.headers.merge!(user.create_new_auth_token) }
+  before do
+    login(user:)
+    request.headers.merge!('Authorization' => "Bearer #{access_token(user:)}")
+  end
 
   describe 'POST #create' do
     let(:valid_attributes) { attributes_for(:project) }
@@ -16,7 +19,7 @@ RSpec.describe Api::V1::ProjectsController do
   end
 
   describe 'PATCH #update' do
-    let(:project)        { create(:project, user: user) }
+    let(:project)        { create(:project, user:) }
     let(:new_attributes) { attributes_for(:project, name: 'New name') }
 
     it 'updates the requested project' do
@@ -27,7 +30,7 @@ RSpec.describe Api::V1::ProjectsController do
   end
 
   describe 'DELETE #destroy' do
-    let!(:project) { create(:project, user: user) }
+    let!(:project) { create(:project, user:) }
 
     it 'destroys the requested project' do
       expect do

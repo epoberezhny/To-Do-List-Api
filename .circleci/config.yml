@@ -3,15 +3,13 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/ruby:2.5.1
+      - image: cimg/ruby:3.3.1
         environment:
           RAILS_ENV: test
 
-      - image: circleci/postgres:10
+      - image: cimg/postgres:16.2
         environment:
-          POSTGRES_USER: todolist
-          POSTGRES_PASSWORD: todolist
-          POSTGRES_DB: To_Do_List_Api_test
+          POSTGRES_USER: postgres
 
     steps:
       - checkout
@@ -34,8 +32,12 @@ jobs:
           command: dockerize -wait tcp://localhost:5432 -timeout 15s
 
       - run:
+          name: Rubocop
+          command: bundle exec rubocop
+
+      - run:
           name: Database setup
-          command: bin/rails db:schema:load --trace
+          command: bin/rails db:create && bin/rails db:schema:load --trace
 
       - run:
           name: Run rspec
@@ -48,25 +50,25 @@ jobs:
       - store_test_results:
           path: test_results
 
-  deploy:
-      docker:
-        - image: buildpack-deps:trusty
-      steps:
-        - checkout
+  # deploy:
+  #     docker:
+  #       - image: buildpack-deps:trusty
+  #     steps:
+  #       - checkout
 
-        - run:
-            name: Deploy Master to Heroku
-            command: |
-              git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git master
+  #       - run:
+  #           name: Deploy Master to Heroku
+  #           command: |
+  #             git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git master
 
 workflows:
   version: 2
   build-deploy:
     jobs:
       - build
-      - deploy:
-          requires:
-            - build
-          filters:
-            branches:
-              only: master
+      # - deploy:
+      #     requires:
+      #       - build
+      #     filters:
+      #       branches:
+      #         only: master
