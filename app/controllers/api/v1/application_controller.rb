@@ -27,10 +27,9 @@ module Api
         if record.save
           render_json(record) and return unless new_record
 
-          yield record if block_given?
           render_json(record, status: :created, location: options[:location].call)
         else
-          render_json(record.errors.full_messages, status: :unprocessable_entity)
+          render_record_errors(record)
         end
       end
     end

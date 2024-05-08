@@ -10,7 +10,6 @@ end
 ruby '3.3.1'
 
 gem 'bootsnap', require: false
-gem 'oj'
 gem 'pg'
 gem 'puma'
 gem 'rails', '~> 7.1.0'
@@ -20,6 +19,9 @@ gem 'jwt'
 gem 'rodauth-rails'
 
 gem 'rack-cors'
+
+gem 'jserializer'
+gem 'oj'
 
 # gem 'image_processing'
 gem 'shrine'

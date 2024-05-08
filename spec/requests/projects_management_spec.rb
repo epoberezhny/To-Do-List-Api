@@ -12,7 +12,7 @@ RSpec.describe 'Projects management' do
 
       before { get(api_v1_projects_path, headers:) }
 
-      include_examples 'match schema', 'projects'
+      include_examples 'match schema', 'api/v1/projects/collection'
 
       it_behaves_like 'successful response'
     end
@@ -30,7 +30,7 @@ RSpec.describe 'Projects management' do
 
       before { get(api_v1_project_path(project), headers:) }
 
-      include_examples 'match schema', 'project'
+      include_examples 'match schema', 'api/v1/projects/single'
 
       it_behaves_like 'successful response'
     end
@@ -64,7 +64,7 @@ RSpec.describe 'Projects management' do
 
       before { post(api_v1_projects_path, headers:, params:) }
 
-      include_examples 'match schema', 'project'
+      include_examples 'match schema', 'api/v1/projects/single'
 
       it_behaves_like 'created response' do
         let(:location) { api_v1_project_url(Project.last) }
@@ -75,6 +75,8 @@ RSpec.describe 'Projects management' do
       let(:params) { attributes_for(:project, name: '') }
 
       before { post(api_v1_projects_path, headers:, params:) }
+
+      include_examples 'match schema', 'api/v1/errors'
 
       it_behaves_like 'unprocessable response'
     end
@@ -93,7 +95,7 @@ RSpec.describe 'Projects management' do
 
       before { patch(api_v1_project_path(project), headers:, params:) }
 
-      include_examples 'match schema', 'project'
+      include_examples 'match schema', 'api/v1/projects/single'
 
       it_behaves_like 'successful response'
     end
@@ -103,6 +105,8 @@ RSpec.describe 'Projects management' do
       let(:params)  { attributes_for(:project, name: '') }
 
       before { patch(api_v1_project_path(project), headers:, params:) }
+
+      include_examples 'match schema', 'api/v1/errors'
 
       it_behaves_like 'unprocessable response'
     end

@@ -1,9 +1,10 @@
 {
-  "id": "file:/project.json#",
+  "id": "file:/api/v1/project.json#",
   "type": "object",
   "required": [
     "id",
-    "name"
+    "name",
+    "created_at"
   ],
   "properties": {
     "id": {
@@ -11,6 +12,10 @@
     },
     "name": {
       "type": "string"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
     }
   }
 }

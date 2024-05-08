@@ -13,7 +13,7 @@ RSpec.describe 'Tasks management' do
 
       before { get(api_v1_project_tasks_path(project), headers:) }
 
-      include_examples 'match schema', 'tasks'
+      include_examples 'match schema', 'api/v1/tasks/collection'
 
       it_behaves_like 'successful response'
     end
@@ -31,7 +31,7 @@ RSpec.describe 'Tasks management' do
 
       before { get(api_v1_project_task_path(project, task), headers:) }
 
-      include_examples 'match schema', 'task'
+      include_examples 'match schema', 'api/v1/tasks/single'
 
       it_behaves_like 'successful response'
     end
@@ -66,7 +66,7 @@ RSpec.describe 'Tasks management' do
 
       before { post(api_v1_project_tasks_path(project), headers:, params:) }
 
-      include_examples 'match schema', 'task'
+      include_examples 'match schema', 'api/v1/tasks/single'
 
       it_behaves_like 'created response' do
         let(:location) { api_v1_project_task_url(project, Task.last) }
@@ -77,6 +77,8 @@ RSpec.describe 'Tasks management' do
       let(:params) { attributes_for(:task, name: '') }
 
       before { post(api_v1_project_tasks_path(project), headers:, params:) }
+
+      include_examples 'match schema', 'api/v1/errors'
 
       it_behaves_like 'unprocessable response'
     end
@@ -95,7 +97,7 @@ RSpec.describe 'Tasks management' do
 
       before { patch(api_v1_project_task_path(project, task), headers:, params:) }
 
-      include_examples 'match schema', 'task'
+      include_examples 'match schema', 'api/v1/tasks/single'
 
       it_behaves_like 'successful response'
     end
@@ -105,6 +107,8 @@ RSpec.describe 'Tasks management' do
       let(:params) { attributes_for(:task, name: '') }
 
       before { patch(api_v1_project_task_path(project, task), headers:, params:) }
+
+      include_examples 'match schema', 'api/v1/errors'
 
       it_behaves_like 'unprocessable response'
     end

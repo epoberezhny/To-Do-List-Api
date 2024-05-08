@@ -30,6 +30,10 @@ module Api
       def project_params
         params.permit(:name)
       end
+
+      def serializer_class
+        Api::V1::ProjectSerializer
+      end
     end
   end
 end

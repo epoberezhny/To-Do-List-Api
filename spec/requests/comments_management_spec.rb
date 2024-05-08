@@ -14,7 +14,7 @@ RSpec.describe 'Comments management' do
 
       before { get(api_v1_project_task_comments_path(project, task), headers:) }
 
-      include_examples 'match schema', 'comments'
+      include_examples 'match schema', 'api/v1/comments/collection'
 
       it_behaves_like 'successful response'
     end
@@ -32,7 +32,7 @@ RSpec.describe 'Comments management' do
 
       before { get(api_v1_project_task_comment_path(project, task, comment), headers:) }
 
-      include_examples 'match schema', 'comment'
+      include_examples 'match schema', 'api/v1/comments/single'
 
       it_behaves_like 'successful response'
     end
@@ -50,9 +50,7 @@ RSpec.describe 'Comments management' do
     describe 'not found' do
       let(:comment) { create(:comment, task:) }
 
-      before do
-        get(api_v1_project_task_comment_path(project, task, comment.id + 1), headers:)
-      end
+      before { get(api_v1_project_task_comment_path(project, task, comment.id + 1), headers:) }
 
       it_behaves_like 'not found response'
     end
@@ -68,11 +66,9 @@ RSpec.describe 'Comments management' do
     describe 'created' do
       let(:params) { attributes_for(:comment) }
 
-      before do
-        post(api_v1_project_task_comments_path(project, task), headers:, params:)
-      end
+      before { post(api_v1_project_task_comments_path(project, task), headers:, params:) }
 
-      include_examples 'match schema', 'comment'
+      include_examples 'match schema', 'api/v1/comments/single'
 
       it_behaves_like 'created response' do
         let(:location) { api_v1_project_task_comment_url(project, task, Comment.last) }
@@ -82,9 +78,9 @@ RSpec.describe 'Comments management' do
     describe 'unprocessable' do
       let(:params) { attributes_for(:comment, text: '') }
 
-      before do
-        post(api_v1_project_task_comments_path(project, task), headers:, params:)
-      end
+      before { post(api_v1_project_task_comments_path(project, task), headers:, params:) }
+
+      include_examples 'match schema', 'api/v1/errors'
 
       it_behaves_like 'unprocessable response'
     end
@@ -101,12 +97,9 @@ RSpec.describe 'Comments management' do
       let(:comment) { create(:comment, task:) }
       let(:params)  { attributes_for(:comment, name: 'New name') }
 
-      before do
-        patch(api_v1_project_task_comment_path(project, task, comment), headers:,
-                                                                        params:)
-      end
+      before { patch(api_v1_project_task_comment_path(project, task, comment), headers:, params:) }
 
-      include_examples 'match schema', 'comment'
+      include_examples 'match schema', 'api/v1/comments/single'
 
       it_behaves_like 'successful response'
     end
@@ -115,10 +108,9 @@ RSpec.describe 'Comments management' do
       let(:comment) { create(:comment, task:) }
       let(:params)  { attributes_for(:comment, text: '') }
 
-      before do
-        patch(api_v1_project_task_comment_path(project, task, comment), headers:,
-                                                                        params:)
-      end
+      before { patch(api_v1_project_task_comment_path(project, task, comment), headers:, params:) }
+
+      include_examples 'match schema', 'api/v1/errors'
 
       it_behaves_like 'unprocessable response'
     end

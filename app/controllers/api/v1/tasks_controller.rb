@@ -31,6 +31,10 @@ module Api
       def task_params
         params.permit(:name, :done, :priority, :deadline)
       end
+
+      def serializer_class
+        Api::V1::TaskSerializer
+      end
     end
   end
 end

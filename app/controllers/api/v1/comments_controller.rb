@@ -16,9 +16,9 @@ module Api
       end
 
       def create
-        location_lambda = -> { api_v1_project_task_comment_url(@project, @task, @comment) }
+        location = -> { api_v1_project_task_comment_url(@project, @task, @comment) }
 
-        process_record(@comment, location: location_lambda, &:reload)
+        process_record(@comment, location:)
       end
 
       def update
@@ -35,8 +35,8 @@ module Api
         params.permit(:text, :attachment)
       end
 
-      def default_render_options
-        { except: %i[attachment_data], methods: %i[attachment_url] }
+      def serializer_class
+        Api::V1::CommentSerializer
       end
     end
   end

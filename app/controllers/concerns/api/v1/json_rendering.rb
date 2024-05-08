@@ -5,12 +5,24 @@ module Api
     module JsonRendering
       private
 
-      def render_json(object, **options)
-        render(json: object, **default_render_options.merge(options))
+      def render_json(object, serializer: serializer_class, **)
+        render(json: object, **) and return if serializer.nil? || object.is_a?(Hash)
+
+        is_collection = object.respond_to?(:each)
+
+        render(json: serializer.new(object, is_collection:), **)
       end
 
-      def default_render_options
-        {}
+      def render_record_errors(record)
+        errors = record.errors.map do |error|
+          { title: error.type, detail: error.message, attribute: error.attribute }
+        end
+
+        render_json({ errors: }, status: :unprocessable_entity)
+      end
+
+      def serializer_class
+        nil
       end
     end
   end

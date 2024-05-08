@@ -1,12 +1,13 @@
 {
-  "id": "file:/task.json#",
+  "id": "file:/api/v1/task.json#",
   "type": "object",
   "required": [
     "id",
     "name",
     "done",
     "priority",
-    "deadline"
+    "deadline",
+    "created_at"
   ],
   "properties": {
     "id": {
@@ -23,6 +24,10 @@
     },
     "deadline": {
       "type": ["string", "null"],
+      "format": "date-time"
+    },
+    "created_at": {
+      "type": "string",
       "format": "date-time"
     }
   }
