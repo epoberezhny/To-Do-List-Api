@@ -4,7 +4,7 @@
   "required": [
     "id",
     "text",
-    "attachment",
+    "attachment_url",
     "created_at"
   ],
   "properties": {
@@ -18,16 +18,11 @@
       "type": "string",
       "format": "date-time"
     },
-    "attachment": {
-      "type": "object",
-      "properties": {
-        "url": {
-          "type": [
-            "null",
-            "string"
-          ]
-        }
-      }
+    "attachment_url": {
+      "type": [
+        "null",
+        "string"
+      ]
     }
   }
 }

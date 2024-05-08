@@ -22,8 +22,4 @@ RSpec.describe Comment do
       end
     end
   end
-
-  describe 'columns' do
-    it { is_expected.to have_db_column(:attachment) }
-  end
 end

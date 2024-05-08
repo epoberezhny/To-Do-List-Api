@@ -21,8 +21,9 @@ gem 'rodauth-rails'
 
 gem 'rack-cors'
 
-gem 'carrierwave'
-gem 'cloudinary'
+# gem 'image_processing'
+gem 'shrine'
+gem 'shrine-cloudinary'
 
 gem 'acts_as_list'
 

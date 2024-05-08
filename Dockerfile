@@ -93,6 +93,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   apt-get update -qq && apt-get upgrade -yq && \
   DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends \
     build-essential \
+    file \
+    # libvips \
     git
 
 FROM builder as prod

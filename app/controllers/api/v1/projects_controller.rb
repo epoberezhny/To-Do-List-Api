@@ -2,23 +2,23 @@
 
 module Api
   module V1
-    class ProjectsController < Api::V1::ApplicationController
+    class ProjectsController < ApplicationController
       load_and_authorize_resource
 
       def index
-        render json: @projects
+        render_json(@projects)
       end
 
       def show
-        render json: @project
+        render_json(@project)
       end
 
       def create
-        process_record @project, location: -> { api_v1_project_url(@project) }
+        process_record(@project, location: -> { api_v1_project_url(@project) })
       end
 
       def update
-        process_record @project, params: project_params
+        process_record(@project, params: project_params)
       end
 
       def destroy

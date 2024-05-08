@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Comment < ApplicationRecord
-  mount_uploader :attachment, AttachmentUploader
+  include AttachmentUploader::Attachment(:attachment)
 
   belongs_to :task, counter_cache: true
 

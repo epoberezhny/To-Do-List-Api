@@ -2,7 +2,9 @@
 
 module Api
   module V1
-    class ApplicationController < ApplicationController
+    class ApplicationController < ::ApplicationController
+      include Authentication
+      include JsonRendering
       include CanCan::ControllerAdditions
 
       before_action :authenticate_user!
@@ -23,12 +25,12 @@ module Api
         record.assign_attributes(options[:params]) unless new_record
 
         if record.save
-          render json: record and return unless new_record
+          render_json(record) and return unless new_record
 
           yield record if block_given?
-          render json: record, status: :created, location: options[:location].call
+          render_json(record, status: :created, location: options[:location].call)
         else
-          render json: record.errors.full_messages, status: :unprocessable_entity
+          render_json(record.errors.full_messages, status: :unprocessable_entity)
         end
       end
     end

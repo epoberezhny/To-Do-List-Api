@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2017_10_29_215645) do
+ActiveRecord::Schema[7.1].define(version: 2024_05_06_214822) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "plpgsql"
@@ -18,9 +18,9 @@ ActiveRecord::Schema[7.1].define(version: 2017_10_29_215645) do
   create_table "comments", force: :cascade do |t|
     t.text "text"
     t.bigint "task_id"
-    t.string "attachment"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
+    t.jsonb "attachment_data"
     t.index ["task_id"], name: "index_comments_on_task_id"
   end
 
