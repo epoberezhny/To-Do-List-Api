@@ -38,9 +38,11 @@ RSpec.describe Api::V1::CommentsController do
 
     it 'destroys the requested comment' do
       expect do
-        delete :destroy,
-               params: { id: comment.to_param, project_id: comment.task.project.id,
-                         task_id: comment.task.id }
+        delete :destroy, params: {
+          id: comment.to_param,
+          project_id: comment.task.project.id,
+          task_id: comment.task.id
+        }
       end.to change(Comment, :count).by(-1)
     end
   end

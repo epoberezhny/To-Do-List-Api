@@ -1,180 +1,209 @@
 # frozen_string_literal: true
 
+require 'swagger_helper'
+
 RSpec.describe 'Comments management' do
-  let(:user)    { create(:user) }
-  let(:headers) { { 'Authorization' => "Bearer #{access_token(user:)}" } }
+  let(:user) { create(:user) }
+  let(:Authorization) { "Bearer #{access_token(user:)}" }
+
   let(:project) { create(:project, user:) }
-  let(:task)    { create(:task, project:) }
+  let(:task) { create(:task, project:) }
+  let(:project_id) { project.id }
+  let(:task_id) { task.id }
 
   before { login(user:) }
 
-  describe 'GET api/v1/projects/:project_id/tasks/:task_id/comments' do
-    describe 'success' do
-      let!(:comment) { create_list(:comment, 3, task:) }
-
-      before { get(api_v1_project_task_comments_path(project, task), headers:) }
-
-      include_examples 'match schema', 'api/v1/comments/collection'
-
-      it_behaves_like 'successful response'
-    end
-
-    describe 'unauthorized' do
-      before { get(api_v1_project_task_comments_path(project, task)) }
-
-      it_behaves_like 'unauthorized response'
-    end
+  def self.common_options
+    tags 'Comments'
+    security [bearerAuth: []]
+    consumes 'application/json'
+    produces 'application/json'
+    parameter name: :project_id, in: :path, type: :integer, required: true
+    parameter name: :task_id, in: :path, type: :integer, required: true
   end
 
-  describe 'GET /api/v1/projects/:project_id/tasks/:task_id/comments/:id' do
-    describe 'success' do
-      let(:comment) { create(:comment, task:) }
-
-      before { get(api_v1_project_task_comment_path(project, task, comment), headers:) }
-
-      include_examples 'match schema', 'api/v1/comments/single'
-
-      it_behaves_like 'successful response'
-    end
-
-    describe 'forbidden' do
-      let(:comment) { create(:comment) }
-      let(:task)    { comment.task }
-      let(:project) { task.project }
-
-      before { get(api_v1_project_task_comment_path(project, task, comment), headers:) }
-
-      it_behaves_like 'forbidden response'
-    end
-
-    describe 'not found' do
-      let(:comment) { create(:comment, task:) }
-
-      before { get(api_v1_project_task_comment_path(project, task, comment.id + 1), headers:) }
-
-      it_behaves_like 'not found response'
-    end
-
-    describe 'unauthorized' do
-      before { get api_v1_project_task_comment_path(project, task, 1) }
-
-      it_behaves_like 'unauthorized response'
-    end
+  def self.comment_schema
+    {
+      type: :object,
+      properties: {
+        id: { type: :integer },
+        text: { type: :string },
+        attachment_url: { type: :string, nullable: true },
+        created_at: { type: :string, format: 'date-time' }
+      },
+      required: %i[id text attachment_url created_at],
+      additionalProperties: false
+    }
   end
 
-  describe 'POST /api/v1/projects/:project_id/tasks/:task_id/comments' do
-    describe 'created' do
+  def self.composed_schema
+    {
+      type: :object,
+      properties: { data: comment_schema },
+      required: %i[data],
+      additionalProperties: false
+    }
+  end
+
+  path '/api/v1/projects/{project_id}/tasks/{task_id}/comments' do
+    post 'Create a comment' do
+      common_options
+      parameter name: :params, in: :body, schema: {
+        type: :object,
+        properties: {
+          text: { type: :string },
+          attachment: { type: :object }
+        },
+        required: %i[name]
+      }
+
       let(:params) { attributes_for(:comment) }
 
-      before { post(api_v1_project_task_comments_path(project, task), headers:, params:) }
-
-      include_examples 'match schema', 'api/v1/comments/single'
-
-      it_behaves_like 'created response' do
+      describe '201' do
         let(:location) { api_v1_project_task_comment_url(project, task, Comment.last) }
+
+        include_examples 'created response'
+      end
+
+      it_behaves_like 'failed token auth'
+
+      describe '403' do
+        let(:project) { create(:project) }
+
+        include_examples 'forbidden response'
+      end
+
+      describe '422' do
+        let(:params) { attributes_for(:comment, text: '') }
+
+        include_examples 'unprocessable response'
       end
     end
 
-    describe 'unprocessable' do
-      let(:params) { attributes_for(:comment, text: '') }
+    get 'List of comments' do
+      common_options
 
-      before { post(api_v1_project_task_comments_path(project, task), headers:, params:) }
+      def self.composed_schema
+        {
+          type: :object,
+          properties: {
+            data: { type: :array, items: comment_schema }
+          },
+          required: %i[data],
+          additionalProperties: false
+        }
+      end
 
-      include_examples 'match schema', 'api/v1/errors'
+      describe '200' do
+        before { create_list(:comment, 2, task:) }
 
-      it_behaves_like 'unprocessable response'
-    end
+        include_examples 'success response'
+      end
 
-    describe 'unauthorized' do
-      before { post(api_v1_project_task_comments_path(project, task)) }
+      it_behaves_like 'failed token auth'
 
-      it_behaves_like 'unauthorized response'
+      describe '403' do
+        let(:project) { create(:project) }
+
+        include_examples 'forbidden response'
+      end
     end
   end
 
-  describe 'PATCH /api/v1/projects/:project_id/tasks/:task_id/cooments/:id' do
-    describe 'success' do
-      let(:comment) { create(:comment, task:) }
-      let(:params)  { attributes_for(:comment, name: 'New name') }
+  path '/api/v1/projects/{project_id}/tasks/{task_id}/comments/{id}' do
+    let(:comment) { create(:comment, task:) }
+    let(:id) { comment.id }
 
-      before { patch(api_v1_project_task_comment_path(project, task, comment), headers:, params:) }
-
-      include_examples 'match schema', 'api/v1/comments/single'
-
-      it_behaves_like 'successful response'
+    def self.common_options
+      super
+      parameter name: :id, in: :path, type: :integer, required: true
     end
 
-    describe 'unprocessable' do
-      let(:comment) { create(:comment, task:) }
-      let(:params)  { attributes_for(:comment, text: '') }
+    shared_examples 'not found responses' do
+      describe '404' do
+        context 'when comment not found' do
+          let(:id) { comment.id + 1 }
 
-      before { patch(api_v1_project_task_comment_path(project, task, comment), headers:, params:) }
+          include_examples 'not found response'
+        end
 
-      include_examples 'match schema', 'api/v1/errors'
+        context 'when task not found' do
+          let(:task_id) { task.id + 1 }
 
-      it_behaves_like 'unprocessable response'
+          include_examples 'not found response'
+        end
+
+        context 'when project not found' do
+          let(:project_id) { project.id + 1 }
+
+          include_examples 'not found response'
+        end
+      end
     end
 
-    describe 'forbidden' do
-      let(:comment) { create(:comment) }
-      let(:task)    { comment.task }
-      let(:project) { task.project }
+    shared_examples 'forbidden responses' do
+      describe '403' do
+        let(:project) { create(:project) }
 
-      before { patch(api_v1_project_task_comment_path(project, task, comment), headers:) }
-
-      it_behaves_like 'forbidden response'
+        include_examples 'forbidden response'
+      end
     end
 
-    describe 'not found' do
-      let(:comment) { create(:comment, task:) }
+    get 'Single comment' do
+      common_options
 
-      before do
-        patch(api_v1_project_task_comment_path(project, task, comment.id + 1), headers:)
+      describe '200' do
+        include_examples 'success response'
       end
 
-      it_behaves_like 'not found response'
+      it_behaves_like 'failed token auth'
+
+      include_examples 'forbidden responses'
+
+      include_examples 'not found responses'
     end
 
-    describe 'unauthorized' do
-      before { patch(api_v1_project_task_comment_path(project, task, 1)) }
+    delete 'Delete task' do
+      common_options
 
-      it_behaves_like 'unauthorized response'
-    end
-  end
-
-  describe 'DELETE /api/v1/projects/:project_id/tasks/:task_id/comments/:id' do
-    describe 'success' do
-      let(:comment) { create(:comment, task:) }
-
-      before { delete(api_v1_project_task_comment_path(project, task, comment), headers:) }
-
-      it_behaves_like 'successful response'
-    end
-
-    describe 'forbidden' do
-      let(:comment) { create(:comment) }
-      let(:task)    { comment.task }
-      let(:project) { task.project }
-
-      before { delete(api_v1_project_task_comment_path(project, task, comment), headers:) }
-
-      it_behaves_like 'forbidden response'
-    end
-
-    describe 'not found' do
-      let(:comment) { create(:comment, task:) }
-
-      before do
-        delete(api_v1_project_task_comment_path(project, task, comment.id + 1), headers:)
+      describe '204' do
+        include_examples 'no content response'
       end
 
-      it_behaves_like 'not found response'
+      it_behaves_like 'failed token auth'
+
+      include_examples 'forbidden responses'
+
+      include_examples 'not found responses'
     end
 
-    describe 'unauthorized' do
-      before { delete api_v1_project_task_comment_path(project, task, 1) }
+    patch 'Update task' do
+      common_options
+      parameter name: :params, in: :body, schema: {
+        type: :object,
+        properties: {
+          text: { type: :string },
+          attachment: { type: :object }
+        }
+      }
 
-      it_behaves_like 'unauthorized response'
+      let(:params) { attributes_for(:comment) }
+
+      describe '200' do
+        include_examples 'success response'
+      end
+
+      it_behaves_like 'failed token auth'
+
+      include_examples 'forbidden responses'
+
+      include_examples 'not found responses'
+
+      describe '422' do
+        let(:params) { attributes_for(:comment, text: '') }
+
+        include_examples 'unprocessable response'
+      end
     end
   end
 end

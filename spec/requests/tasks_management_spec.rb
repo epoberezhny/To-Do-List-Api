@@ -1,172 +1,210 @@
 # frozen_string_literal: true
 
+require 'swagger_helper'
+
 RSpec.describe 'Tasks management' do
-  let(:user)    { create(:user) }
-  let(:headers) { { 'Authorization' => "Bearer #{access_token(user:)}" } }
+  let(:user) { create(:user) }
+  let(:Authorization) { "Bearer #{access_token(user:)}" }
+
   let(:project) { create(:project, user:) }
+  let(:project_id) { project.id }
 
   before { login(user:) }
 
-  describe 'GET api/v1/projects/:project_id/tasks' do
-    describe 'success' do
-      let!(:task) { create_list(:task, 3, project:) }
-
-      before { get(api_v1_project_tasks_path(project), headers:) }
-
-      include_examples 'match schema', 'api/v1/tasks/collection'
-
-      it_behaves_like 'successful response'
-    end
-
-    describe 'unauthorized' do
-      before { get(api_v1_project_tasks_path(project)) }
-
-      it_behaves_like 'unauthorized response'
-    end
+  def self.common_options
+    tags 'Tasks'
+    security [bearerAuth: []]
+    consumes 'application/json'
+    produces 'application/json'
+    parameter name: :project_id, in: :path, type: :integer, required: true
   end
 
-  describe 'GET /api/v1/projects/:project_id/tasks/:id' do
-    describe 'success' do
-      let(:task) { create(:task, project:) }
-
-      before { get(api_v1_project_task_path(project, task), headers:) }
-
-      include_examples 'match schema', 'api/v1/tasks/single'
-
-      it_behaves_like 'successful response'
-    end
-
-    describe 'forbidden' do
-      let(:task)    { create(:task) }
-      let(:project) { task.project }
-
-      before { get(api_v1_project_task_path(project, task), headers:) }
-
-      it_behaves_like 'forbidden response'
-    end
-
-    describe 'not found' do
-      let(:task) { create(:task, project:) }
-
-      before { get(api_v1_project_task_path(project, task.id + 1), headers:) }
-
-      it_behaves_like 'not found response'
-    end
-
-    describe 'unauthorized' do
-      before { get api_v1_project_task_path(project, 1) }
-
-      it_behaves_like 'unauthorized response'
-    end
+  def self.task_schema
+    {
+      type: :object,
+      properties: {
+        id: { type: :integer },
+        name: { type: :string },
+        done: { type: :boolean },
+        priority: { type: :integer },
+        deadline: {
+          type: :string,
+          nullable: true,
+          format: 'date-time'
+        },
+        created_at: {
+          type: :string,
+          format: 'date-time'
+        }
+      },
+      required: %i[id name done priority deadline created_at],
+      additionalProperties: false
+    }
   end
 
-  describe 'POST /api/v1/projects/:project_id/tasks' do
-    describe 'created' do
+  def self.composed_schema
+    {
+      type: :object,
+      properties: { data: task_schema },
+      required: %i[data],
+      additionalProperties: false
+    }
+  end
+
+  path '/api/v1/projects/{project_id}/tasks' do
+    post 'Create a task' do
+      common_options
+      parameter name: :params, in: :body, schema: {
+        type: :object,
+        properties: {
+          name: { type: :string }
+        },
+        required: %i[name]
+      }
+
       let(:params) { attributes_for(:task) }
 
-      before { post(api_v1_project_tasks_path(project), headers:, params:) }
-
-      include_examples 'match schema', 'api/v1/tasks/single'
-
-      it_behaves_like 'created response' do
+      describe '201' do
         let(:location) { api_v1_project_task_url(project, Task.last) }
+
+        include_examples 'created response'
+      end
+
+      it_behaves_like 'failed token auth'
+
+      describe '403' do
+        let(:project) { create(:project) }
+
+        include_examples 'forbidden response'
+      end
+
+      describe '422' do
+        let(:params) { attributes_for(:task, name: '') }
+
+        include_examples 'unprocessable response'
       end
     end
 
-    describe 'unprocessable' do
-      let(:params) { attributes_for(:task, name: '') }
+    get 'List of tasks' do
+      common_options
 
-      before { post(api_v1_project_tasks_path(project), headers:, params:) }
+      def self.composed_schema
+        {
+          type: :object,
+          properties: {
+            data: { type: :array, items: task_schema }
+          },
+          required: %i[data],
+          additionalProperties: false
+        }
+      end
 
-      include_examples 'match schema', 'api/v1/errors'
+      describe '200' do
+        before { create_list(:task, 2, project:) }
 
-      it_behaves_like 'unprocessable response'
-    end
+        include_examples 'success response'
+      end
 
-    describe 'unauthorized' do
-      before { post(api_v1_project_tasks_path(project)) }
+      it_behaves_like 'failed token auth'
 
-      it_behaves_like 'unauthorized response'
-    end
-  end
+      describe '403' do
+        let(:project) { create(:project) }
 
-  describe 'PATCH /api/v1/projects/:project_id/tasks/:id' do
-    describe 'success' do
-      let(:task)   { create(:task, project:) }
-      let(:params) { attributes_for(:task, name: 'New name') }
-
-      before { patch(api_v1_project_task_path(project, task), headers:, params:) }
-
-      include_examples 'match schema', 'api/v1/tasks/single'
-
-      it_behaves_like 'successful response'
-    end
-
-    describe 'unprocessable' do
-      let(:task)   { create(:task, project:) }
-      let(:params) { attributes_for(:task, name: '') }
-
-      before { patch(api_v1_project_task_path(project, task), headers:, params:) }
-
-      include_examples 'match schema', 'api/v1/errors'
-
-      it_behaves_like 'unprocessable response'
-    end
-
-    describe 'forbidden' do
-      let(:task)    { create(:task) }
-      let(:project) { task.project }
-
-      before { patch(api_v1_project_task_path(project, task), headers:) }
-
-      it_behaves_like 'forbidden response'
-    end
-
-    describe 'not found' do
-      let(:task) { create(:task, project:) }
-
-      before { patch(api_v1_project_task_path(project, task.id + 1), headers:) }
-
-      it_behaves_like 'not found response'
-    end
-
-    describe 'unauthorized' do
-      before { patch(api_v1_project_task_path(project, 1)) }
-
-      it_behaves_like 'unauthorized response'
+        include_examples 'forbidden response'
+      end
     end
   end
 
-  describe 'DELETE /api/v1/projects/:project_id/tasks/:id' do
-    describe 'success' do
-      let(:task) { create(:task, project:) }
+  path '/api/v1/projects/{project_id}/tasks/{id}' do
+    let(:task) { create(:task, project:) }
+    let(:id) { task.id }
 
-      before { delete(api_v1_project_task_path(project, task), headers:) }
-
-      it_behaves_like 'successful response'
+    def self.common_options
+      super
+      parameter name: :id, in: :path, type: :integer, required: true
     end
 
-    describe 'forbidden' do
-      let(:task)    { create(:task) }
-      let(:project) { task.project.id }
+    shared_examples 'not found responses' do
+      describe '404' do
+        context 'when task not found' do
+          let(:id) { task.id + 1 }
 
-      before { delete(api_v1_project_task_path(project, task), headers:) }
+          include_examples 'not found response'
+        end
 
-      it_behaves_like 'forbidden response'
+        context 'when project not found' do
+          let(:project_id) { project.id + 1 }
+
+          include_examples 'not found response'
+        end
+      end
     end
 
-    describe 'not found' do
-      let(:task) { create(:task, project:) }
+    shared_examples 'forbidden responses' do
+      describe '403' do
+        let(:project) { create(:project) }
 
-      before { delete(api_v1_project_task_path(project, task.id + 1), headers:) }
-
-      it_behaves_like 'not found response'
+        include_examples 'forbidden response'
+      end
     end
 
-    describe 'unauthorized' do
-      before { delete api_v1_project_task_path(project, 1) }
+    get 'Single task' do
+      common_options
 
-      it_behaves_like 'unauthorized response'
+      describe '200' do
+        include_examples 'success response'
+      end
+
+      it_behaves_like 'failed token auth'
+
+      include_examples 'forbidden responses'
+
+      include_examples 'not found responses'
+    end
+
+    delete 'Delete task' do
+      common_options
+
+      describe '204' do
+        include_examples 'no content response'
+      end
+
+      it_behaves_like 'failed token auth'
+
+      include_examples 'forbidden responses'
+
+      include_examples 'not found responses'
+    end
+
+    patch 'Update task' do
+      common_options
+      parameter name: :params, in: :body, schema: {
+        type: :object,
+        properties: {
+          name: { type: :string },
+          done: { type: :boolean },
+          priority: { type: :integer },
+          deadline: { type: :string, format: 'date-time' }
+        }
+      }
+
+      let(:params) { attributes_for(:task, :full) }
+
+      describe '200' do
+        include_examples 'success response'
+      end
+
+      it_behaves_like 'failed token auth'
+
+      include_examples 'forbidden responses'
+
+      include_examples 'not found responses'
+
+      describe '422' do
+        let(:params) { attributes_for(:task, name: '') }
+
+        include_examples 'unprocessable response'
+      end
     end
   end
 end

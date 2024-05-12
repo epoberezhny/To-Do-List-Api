@@ -1,168 +1,173 @@
 # frozen_string_literal: true
 
+require 'swagger_helper'
+
 RSpec.describe 'Projects management' do
   let(:user) { create(:user) }
-  let(:headers) { { 'Authorization' => "Bearer #{access_token(user:)}" } }
+  let(:Authorization) { "Bearer #{access_token(user:)}" }
 
   before { login(user:) }
 
-  describe 'GET api/v1/projects' do
-    describe 'success' do
-      let!(:projects) { create_list(:project, 3, user:) }
-
-      before { get(api_v1_projects_path, headers:) }
-
-      include_examples 'match schema', 'api/v1/projects/collection'
-
-      it_behaves_like 'successful response'
-    end
-
-    describe 'unauthorized' do
-      before { get(api_v1_projects_path) }
-
-      it_behaves_like 'unauthorized response'
-    end
+  def self.common_options
+    tags 'Projects'
+    security [bearerAuth: []]
+    consumes 'application/json'
+    produces 'application/json'
   end
 
-  describe 'GET /api/v1/projects/:id' do
-    describe 'success' do
-      let(:project) { create(:project, user:) }
-
-      before { get(api_v1_project_path(project), headers:) }
-
-      include_examples 'match schema', 'api/v1/projects/single'
-
-      it_behaves_like 'successful response'
-    end
-
-    describe 'forbidden' do
-      let(:project) { create(:project) }
-
-      before { get(api_v1_project_path(project), headers:) }
-
-      it_behaves_like 'forbidden response'
-    end
-
-    describe 'not found' do
-      let(:project) { create(:project, user:) }
-
-      before { get(api_v1_project_path(project.id + 1), headers:) }
-
-      it_behaves_like 'not found response'
-    end
-
-    describe 'unauthorized' do
-      before { get api_v1_project_path(1) }
-
-      it_behaves_like 'unauthorized response'
-    end
+  def self.project_schema
+    {
+      type: :object,
+      properties: {
+        id: { type: :integer },
+        name: { type: :string },
+        created_at: { type: :string, format: 'date-time' }
+      },
+      required: %i[id name created_at],
+      additionalProperties: false
+    }
   end
 
-  describe 'POST /api/v1/projects' do
-    describe 'created' do
+  def self.composed_schema
+    {
+      type: :object,
+      properties: { data: project_schema },
+      required: %i[data],
+      additionalProperties: false
+    }
+  end
+
+  path '/api/v1/projects' do
+    post 'Create a project' do
+      common_options
+      parameter name: :params, in: :body, schema: {
+        type: :object,
+        properties: {
+          name: { type: :string }
+        },
+        required: %i[name]
+      }
+
       let(:params) { attributes_for(:project) }
 
-      before { post(api_v1_projects_path, headers:, params:) }
-
-      include_examples 'match schema', 'api/v1/projects/single'
-
-      it_behaves_like 'created response' do
+      describe '201' do
         let(:location) { api_v1_project_url(Project.last) }
+
+        include_examples 'created response'
+      end
+
+      it_behaves_like 'failed token auth'
+
+      describe '422' do
+        let(:params) { attributes_for(:project, name: '') }
+
+        include_examples 'unprocessable response'
       end
     end
 
-    describe 'unprocessable' do
-      let(:params) { attributes_for(:project, name: '') }
+    get 'List of projects' do
+      common_options
 
-      before { post(api_v1_projects_path, headers:, params:) }
+      def self.composed_schema
+        {
+          type: :object,
+          properties: {
+            data: { type: :array, items: project_schema }
+          },
+          required: %i[data],
+          additionalProperties: false
+        }
+      end
 
-      include_examples 'match schema', 'api/v1/errors'
+      describe '200' do
+        before { create_list(:project, 2, user:) }
 
-      it_behaves_like 'unprocessable response'
-    end
+        include_examples 'success response'
+      end
 
-    describe 'unauthorized' do
-      before { post(api_v1_projects_path) }
-
-      it_behaves_like 'unauthorized response'
-    end
-  end
-
-  describe 'PATCH /api/v1/project/:id' do
-    describe 'success' do
-      let(:project) { create(:project, user:) }
-      let(:params)  { attributes_for(:project, name: 'New name') }
-
-      before { patch(api_v1_project_path(project), headers:, params:) }
-
-      include_examples 'match schema', 'api/v1/projects/single'
-
-      it_behaves_like 'successful response'
-    end
-
-    describe 'unprocessable' do
-      let(:project) { create(:project, user:) }
-      let(:params)  { attributes_for(:project, name: '') }
-
-      before { patch(api_v1_project_path(project), headers:, params:) }
-
-      include_examples 'match schema', 'api/v1/errors'
-
-      it_behaves_like 'unprocessable response'
-    end
-
-    describe 'forbidden' do
-      let(:project) { create(:project) }
-
-      before { patch(api_v1_project_path(project), headers:) }
-
-      it_behaves_like 'forbidden response'
-    end
-
-    describe 'not found' do
-      let(:project) { create(:project, user:) }
-
-      before { patch(api_v1_project_path(project.id + 1), headers:) }
-
-      it_behaves_like 'not found response'
-    end
-
-    describe 'unauthorized' do
-      before { patch(api_v1_project_path(1)) }
-
-      it_behaves_like 'unauthorized response'
+      it_behaves_like 'failed token auth'
     end
   end
 
-  describe 'DELETE /api/v1/projects/:id' do
-    describe 'success' do
-      let(:project) { create(:project, user:) }
+  path '/api/v1/projects/{id}' do
+    let(:project) { create(:project, user:) }
+    let(:id) { project.id }
 
-      before { delete(api_v1_project_path(project), headers:) }
-
-      it_behaves_like 'successful response'
+    def self.common_options
+      super
+      parameter name: :id, in: :path, type: :integer, required: true
     end
 
-    describe 'forbidden' do
-      let(:project) { create(:project) }
+    shared_examples 'not found responses' do
+      describe '404' do
+        let(:id) { project.id + 1 }
 
-      before { delete(api_v1_project_path(project), headers:) }
-
-      it_behaves_like 'forbidden response'
+        include_examples 'not found response'
+      end
     end
 
-    describe 'not found' do
-      let(:project) { create(:project, user:) }
+    shared_examples 'forbidden responses' do
+      describe '403' do
+        let(:project) { create(:project) }
 
-      before { delete(api_v1_project_path(project.id + 1), headers:) }
-
-      it_behaves_like 'not found response'
+        include_examples 'forbidden response'
+      end
     end
 
-    describe 'unauthorized' do
-      before { delete api_v1_project_path(1) }
+    get 'Single project' do
+      common_options
 
-      it_behaves_like 'unauthorized response'
+      describe '200' do
+        include_examples 'success response'
+      end
+
+      it_behaves_like 'failed token auth'
+
+      include_examples 'forbidden responses'
+
+      include_examples 'not found responses'
+    end
+
+    delete 'Delete project' do
+      common_options
+
+      describe '204' do
+        include_examples 'no content response'
+      end
+
+      it_behaves_like 'failed token auth'
+
+      include_examples 'forbidden responses'
+
+      include_examples 'not found responses'
+    end
+
+    patch 'Update project' do
+      common_options
+      parameter name: :params, in: :body, schema: {
+        type: :object,
+        properties: {
+          name: { type: :string }
+        }
+      }
+
+      let(:params) { attributes_for(:project) }
+
+      describe '200' do
+        include_examples 'success response'
+      end
+
+      it_behaves_like 'failed token auth'
+
+      include_examples 'forbidden responses'
+
+      include_examples 'not found responses'
+
+      describe '422' do
+        let(:params) { attributes_for(:project, name: '') }
+
+        include_examples 'unprocessable response'
+      end
     end
   end
 end

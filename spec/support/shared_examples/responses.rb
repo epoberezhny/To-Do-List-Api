@@ -1,48 +1,81 @@
 # frozen_string_literal: true
 
-RSpec.shared_examples 'successful response' do
-  it 'returns a success response' do
-    expect(response).to be_successful
+RSpec.shared_examples 'success response' do
+  response '200', 'Success' do
+    schema(composed_schema)
+
+    run_test!
   end
 end
 
-RSpec.shared_examples 'unauthorized response' do
-  it 'returns a unauthorized response' do
-    expect(response).to be_unauthorized
-  end
-end
-
-RSpec.shared_examples 'unprocessable response' do
-  it 'returns a unprocessable response' do
-    expect(response).to be_unprocessable
-  end
-end
-
-RSpec.shared_examples 'not found response' do
-  it 'returns a not_found response' do
-    expect(response).to be_not_found
+RSpec.shared_examples 'no content response' do
+  response '204', 'No content' do
+    run_test!
   end
 end
 
 RSpec.shared_examples 'created response' do
-  it 'returns a created response' do
-    expect(response).to be_created
-    expect(response.location).to eq(location)
+  response '201', 'Created' do
+    schema(composed_schema)
+    header 'Location', schema: { type: :string }
+
+    run_test! do
+      expect(response.location).to eq(location)
+    end
   end
 end
 
-RSpec.shared_examples 'json response' do
-  it 'returns a json response' do
-    expect(response.content_type).to eq('application/json')
+RSpec.shared_examples 'bad request response' do
+  response '400', 'Bad request' do
+    schema('$ref' => '#/components/schemas/errors_schema')
+
+    run_test!
+  end
+end
+
+RSpec.shared_examples 'unauthorized response' do
+  response '401', 'Unauthorized' do
+    schema('$ref' => '#/components/schemas/errors_schema')
+
+    before do
+      if respond_to?(:Authorization)
+        public_send(:Authorization)
+        Timecop.travel(30.minutes.after)
+      end
+    end
+
+    run_test!(timecop: true)
   end
 end
 
 RSpec.shared_examples 'forbidden response' do
-  it 'returns a forbidden response' do
-    expect(response).to be_forbidden
+  response '403', 'Forbidden' do
+    run_test!
   end
 end
 
-RSpec.shared_examples 'match schema' do |schema|
-  it { expect(response).to match_response_schema(schema) }
+RSpec.shared_examples 'not found response' do
+  response '404', 'Not found' do
+    run_test!
+  end
+end
+
+RSpec.shared_examples 'unprocessable response' do
+  response '422', 'Unprocessable' do
+    schema('$ref' => '#/components/schemas/errors_schema')
+
+    run_test!
+  end
+end
+
+RSpec.shared_examples 'failed token auth' do
+  describe '400' do
+    let(:Authorization) { nil }
+
+    include_examples 'bad request response'
+  end
+
+  describe '401' do
+    include_examples 'unauthorized response'
+  end
 end

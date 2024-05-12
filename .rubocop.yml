@@ -15,6 +15,9 @@ require:
   - rubocop-rspec_rails
   - rubocop-factory_bot
 
+inherit_gem:
+  rswag-specs: .rubocop_rspec_alias_config.yml
+
 AllCops:
   NewCops: enable
 
@@ -35,6 +38,9 @@ Layout/LineLength:
 Layout/FirstArrayElementIndentation:
   EnforcedStyle: consistent
 
+Layout/ArgumentAlignment:
+  EnforcedStyle: with_fixed_indentation
+
 Metrics/AbcSize:
   Exclude:
     - db/**/*
@@ -42,6 +48,8 @@ Metrics/AbcSize:
 Metrics/MethodLength:
   Exclude:
     - db/**/*
+  AllowedPatterns:
+    - _schema$
 
 RSpec/NestedGroups:
   Max: 5
@@ -53,4 +61,14 @@ RSpec/MultipleMemoizedHelpers:
   Max: 10
 
 RSpec/LetSetup:
+  Enabled: false
+
+RSpec/ExampleLength:
+  Max: 10
+
+RSpec/VariableName:
+  AllowedPatterns:
+    - ^Authorization
+
+RSpec/ScatteredSetup:
   Enabled: false

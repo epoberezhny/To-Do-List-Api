@@ -3,7 +3,7 @@
 require 'sequel/core'
 
 class RodauthMain < Rodauth::Rails::Auth
-  configure do
+  configure do # rubocop:disable Metrics/BlockLength
     domain ENV.fetch('APP_HOST', 'localhost')
 
     # List of authentication features that are loaded.
@@ -40,14 +40,20 @@ class RodauthMain < Rodauth::Rails::Auth
     # Set JWT secret, which is used to cryptographically protect the token.
     jwt_secret { hmac_secret }
     allow_refresh_with_expired_jwt_access_token? true
+    expired_jwt_access_token_status 401
+    invalid_jwt_format_error_message { [{ detail: super() }] }
+    jwt_refresh_invalid_token_message { [{ detail: super() }] }
+    jwt_refresh_without_access_token_message { [{ detail: super() }] }
+    expired_jwt_access_token_message { [{ detail: super() }] }
 
     # Accept only JSON requests.
     only_json? true
     json_response_success_key nil
+    json_response_error_key 'errors'
 
     # Handle login and password confirmation fields on the client side.
     # require_password_confirmation? false
-    # require_login_confirmation? false
+    require_login_confirmation? false
 
     # Use path prefix for all routes.
     # prefix "/auth"
@@ -70,7 +76,7 @@ class RodauthMain < Rodauth::Rails::Auth
     # Change some default param keys.
     login_param 'email'
     # login_confirm_param 'email-confirm'
-    # password_confirm_param "confirm_password"
+    password_confirm_param 'password_confirmation'
 
     # Redirect back to originally requested location after authentication.
     # login_return_to_requested_location? true
@@ -136,5 +142,35 @@ class RodauthMain < Rodauth::Rails::Auth
     # verify_account_grace_period 3.days.to_i
     # reset_password_deadline_interval Hash[hours: 6]
     # verify_login_change_deadline_interval Hash[days: 2]
+  end
+
+  private
+
+  def set_field_error(field, message)
+    return super unless use_json?
+
+    json_response[json_response_error_key] ||= []
+    json_response[json_response_error_key].push(attribute: field, detail: message)
+  end
+
+  def set_error_flash(message) # rubocop:disable Naming/AccessorMethodName
+    return super unless use_json?
+
+    json_response[json_response_error_key] ||= []
+    json_response[json_response_error_key].push(detail: message)
+  end
+
+  def _json_response_body(hash)
+    return super if json_response_error?
+
+    super(data: hash)
+  end
+
+  def _logout_response
+    return super unless use_json?
+    return super if json_response_error?
+
+    response.status = 204
+    return_response
   end
 end
